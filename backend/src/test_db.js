@@ -1,4 +1,4 @@
-import pool from './db.js'; 
+import pool from "./config/db.js";
 async function testConnection() {
     try {
         const client = await pool.connect();
