@@ -2,7 +2,7 @@ import DBLocal from 'db-local'
 import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 
-import {SALT_ROUNDS} from './config.js'
+import {SALT_ROUNDS} from './src/config.js'
 ///para la base
 const { Schema } = new DBLocal({ path: './db' })
 
