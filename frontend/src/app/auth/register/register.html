@@ -1,0 +1,140 @@
+<!-- ============================================================
+     DIV PADRE (contenedor raíz de toda la pantalla)
+     - Ocupa toda la pantalla (min-h-screen) con el fondo morado degradado.
+     - items-center + justify-center: centra el formulario tanto vertical
+       como horizontalmente, sin importar el tamaño de pantalla.
+     ============================================================ -->
+<div
+  class="min-h-screen w-full bg-gradient-to-br from-[#4c2a8f] via-[#5b3aa0] to-[#3d2270] flex items-center justify-center px-6 sm:px-12 py-10">
+
+  <!-- ============================================================
+       TARJETA DEL FORMULARIO DE REGISTRO
+       ============================================================ -->
+  <div class="w-full max-w-lg bg-white/10 backdrop-blur-md rounded-3xl p-8 sm:p-10 shrink-0">
+
+    <p class="text-white text-4xl font-bold mb-2 text-center">Kunibo<span class="align-super text-xs">™</span></p>
+    <p class="text-white text-3xl font-bold mb-6 text-center">Crear cuenta</p>
+
+    <div id="errorBox"
+      class="hidden mb-4 text-sm text-red-200 bg-red-500/20 border border-red-400/40 rounded-lg px-3 py-2"></div>
+    <div id="successBox"
+      class="hidden mb-4 text-sm text-emerald-200 bg-emerald-500/20 border border-emerald-400/40 rounded-lg px-3 py-2">
+    </div>
+
+    <!-- Nombre -->
+    <div class="mb-4">
+      <p class="text-white/70 text-sm font-semibold mb-2">Nombre</p>
+      <input type="text" id="nombre" [(ngModel)]="nombre" name="nombre"
+        class="w-full bg-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-300 border border-white/10"
+        placeholder="Juan Gabriel" />
+    </div>
+
+    <!-- Apellido paterno y materno en la misma fila -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div>
+        <p class="text-white/70 text-sm font-semibold mb-2">Apellido paterno</p>
+        <input type="text" id="apellidoPaterno" [(ngModel)]="apellidoPaterno" name="apellidoPaterno"
+          class="w-full bg-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-300 border border-white/10"
+          placeholder="Pérez" />
+      </div>
+      <div>
+        <p class="text-white/70 text-sm font-semibold mb-2">Apellido materno</p>
+        <input type="text" id="apellidoMaterno" [(ngModel)]="apellidoMaterno" name="apellidoMaterno"
+          class="w-full bg-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-300 border border-white/10"
+          placeholder="Gómez" />
+      </div>
+    </div>
+
+    <!-- Dirección -->
+    <div class="mb-4">
+      <p class="text-white/70 text-sm font-semibold mb-2">Dirección</p>
+      <input type="text" id="direccion" [(ngModel)]="direccion" name="direccion" maxlength="75"
+        class="w-full bg-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-300 border border-white/10"
+        placeholder="Calle, número, colonia" />
+    </div>
+
+    <!-- Teléfono -->
+    <div class="mb-4">
+      <p class="text-white/70 text-sm font-semibold mb-2">Teléfono</p>
+      <input type="tel" id="telefono" [(ngModel)]="telefono" name="telefono" maxlength="12"
+        class="w-full bg-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-300 border border-white/10"
+        placeholder="618 123 4567" />
+    </div>
+
+    <!-- Usuario -->
+    <div class="mb-4">
+      <p class="text-white/70 text-sm font-semibold mb-2">Nombre de usuario</p>
+      <div class="relative">
+        <input type="text" id="usuario" [(ngModel)]="usuario" name="usuario" maxlength="15"
+          class="w-full bg-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-cyan-300 border border-white/10"
+          placeholder="jperez" />
+        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path fill-rule="evenodd"
+              d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+              clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contraseña -->
+    <div class="mb-4">
+      <p class="text-white/70 text-sm font-semibold mb-2">Contraseña</p>
+      <div class="relative">
+        <input [type]="mostrarPassword ? 'text' : 'password'" id="password" [(ngModel)]="password" name="password"
+          class="w-full bg-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-cyan-300 border border-white/10"
+          placeholder="••••••••••••" />
+        <div id="pwToggle" (click)="mostrarPassword = !mostrarPassword"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path
+              d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
+            <path
+              d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z" />
+            <path
+              d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmar contraseña -->
+    <div class="mb-6">
+      <p class="text-white/70 text-sm font-semibold mb-2">Confirmar contraseña</p>
+      <div class="relative">
+        <input [type]="mostrarConfirmarPassword ? 'text' : 'password'" id="confirmarPassword"
+          [(ngModel)]="confirmarPassword" name="confirmarPassword"
+          class="w-full bg-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-cyan-300 border border-white/10"
+          placeholder="••••••••••••" />
+        <div (click)="mostrarConfirmarPassword = !mostrarConfirmarPassword"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path
+              d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
+            <path
+              d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z" />
+            <path
+              d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" id="submitBtn" (click)="onRegistrar()" [disabled]="cargando"
+      class="w-full bg-gradient-to-r from-cyan-300 to-cyan-400 rounded-xl py-3 text-center cursor-pointer hover:opacity-90 transition select-none mb-4 disabled:opacity-50 disabled:cursor-not-allowed">
+      <span *ngIf="!cargando" class="text-white text-lg font-semibold">Registrarme</span>
+      <span *ngIf="cargando" class="text-white text-lg font-semibold">Creando cuenta...</span>
+    </button>
+
+    <p class="text-center text-white/60 text-base mb-3">¿Ya tienes cuenta?</p>
+
+    <button type="button" (click)="onIrALogin()"
+      class="w-full border border-white/30 text-white font-bold text-lg rounded-xl py-3 text-center cursor-pointer hover:bg-white/10 transition">
+      Iniciar sesión
+    </button>
+
+  </div>
+  <!-- FIN TARJETA -->
+</div>
+<!-- FIN DIV PADRE -->
