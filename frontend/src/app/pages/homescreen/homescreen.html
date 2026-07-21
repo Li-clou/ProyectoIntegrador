@@ -1,1 +1,95 @@
-<p>homescreen works!</p>
+<!-- DIV PADRE: Mismo fondo degradado morado de Kunibo -->
+<div
+  class="min-h-screen w-full bg-gradient-to-br from-[#4c2a8f] via-[#5b3aa0] to-[#3d2270] flex flex-col justify-between px-6 sm:px-12 lg:px-20 py-6 gap-8 font-sans"
+>
+  <!-- BARRA DE NAVEGACIÓN (Estilo cristal/glassmorphism como el login) -->
+  <header
+    class="w-full bg-white/10 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between border border-white/10 shrink-0"
+  >
+    <div class="flex items-center gap-2">
+      <!-- Marca Kunibo idéntica -->
+      <p class="text-white font-bold text-4xl tracking-tight">
+        Kunibo<span class="align-super text-[10px]">™</span>
+      </p>
+    </div>
+    <nav class="flex items-center gap-6">
+      <a href="#" class="text-white/70 text-lg font-semibold hover:text-white transition-colors"
+        >Inicio</a
+      >
+      <a href="#" class="text-white/70 text-lg font-semibold hover:text-white transition-colors"
+        >Panel</a
+      >
+      <!-- Botón de salir con el estilo del botón secundario del login -->
+      <button
+        class="border border-white/30 text-white font-bold text-sm rounded-xl px-4 py-2 hover:bg-white/10 transition cursor-pointer"
+      >
+        Cerrar Sesión
+      </button>
+    </nav>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 w-full flex flex-col gap-8 my-auto justify-center">
+    <!-- Contenedor del Mensaje de Bienvenida en Cristal -->
+    <div class="w-full bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/10">
+      <p class="text-white/60 text-2xl">Panel de Control</p>
+      <h1 class="text-white text-5xl font-bold mt-1">¡Qué bueno verte de nuevo, Juan Gabriel!</h1>
+      <p class="text-white/70 text-lg mt-3">
+        Aquí tienes el estado actual de tu proyecto integrador.
+      </p>
+    </div>
+
+    <!-- Rejilla de Tarjetas (Grid) en Cristal -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Tarjeta 1: Estadísticas -->
+      <div
+        class="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/10 hover:bg-white/15 transition group cursor-pointer"
+      >
+        <div
+          class="w-12 h-12 bg-cyan-400/20 rounded-xl flex items-center justify-center text-cyan-300 text-2xl mb-4 group-hover:scale-105 transition-transform"
+        >
+          📊
+        </div>
+        <h2 class="text-white text-2xl font-semibold mb-2">Estadísticas</h2>
+        <p class="text-white/60 text-base">
+          Monitorea el comportamiento y las métricas de tu sistema en tiempo real.
+        </p>
+      </div>
+
+      <!-- Tarjeta 2: Configuración -->
+      <div
+        class="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/10 hover:bg-white/15 transition group cursor-pointer"
+      >
+        <div
+          class="w-12 h-12 bg-cyan-400/20 rounded-xl flex items-center justify-center text-cyan-300 text-2xl mb-4 group-hover:scale-105 transition-transform"
+        >
+          ⚙️
+        </div>
+        <h2 class="text-white text-2xl font-semibold mb-2">Ajustes</h2>
+        <p class="text-white/60 text-base">
+          Administra las preferencias generales, seguridad y variables de entorno.
+        </p>
+      </div>
+
+      <!-- Tarjeta 3: Base de Datos -->
+      <div
+        class="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/10 hover:bg-white/15 transition group cursor-pointer"
+      >
+        <div
+          class="w-12 h-12 bg-gradient-to-r from-cyan-300 to-cyan-400 rounded-xl flex items-center justify-center text-white text-xl mb-4 group-hover:scale-105 transition-transform"
+        >
+          🗄️
+        </div>
+        <h2 class="text-white text-2xl font-semibold mb-2">Servidor Back</h2>
+        <p class="text-white/60 text-base">
+          Verifica el estado de tus endpoints, peticiones HTTP y logs de la base de datos.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- PIE DE PÁGINA (Footer) -->
+  <footer class="w-full text-center text-white/40 text-sm py-4 border-t border-white/5">
+    &copy; 2026 Kunibo. Todos los derechos reservados.
+  </footer>
+</div>
