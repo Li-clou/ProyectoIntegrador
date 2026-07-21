@@ -23,9 +23,12 @@
     "express": "^5.2.1",
     "google-auth-library": "^10.9.0",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^9.0.3",
+    "pdfkit": "^0.19.1",
     "pg": "^8.22.0",
     "swagger-jsdoc": "^6.3.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "twilio": "^6.0.2"
   },
   "eslintConfig": {
     "extends": "standard"
