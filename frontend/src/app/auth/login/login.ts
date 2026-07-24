@@ -46,7 +46,7 @@ export class Login implements AfterViewInit {
     this.authService.loginConGoogle(response.credential).subscribe({
       next: () => {
         this.cargando = false;
-        this.router.navigate(['/']);
+        this.router.navigate(['/home']);
       },
       error: (err) => {
         this.cargando = false;
@@ -68,7 +68,7 @@ export class Login implements AfterViewInit {
     this.authService.login({ usuario: this.usuario, password: this.password }).subscribe({
       next: () => {
         this.cargando = false;
-        this.router.navigate(['/']);
+        this.router.navigate(['/home']);
       },
       error: (err) => {
         this.cargando = false;
