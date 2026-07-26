@@ -4,3 +4,22 @@
 node_modules/
 package-lock.json
 package.json
+# Dependencias
+node_modules/
+**/node_modules/
+
+# Variables de entorno
+.env
+**/.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.vscode/
+.DS_Store
+
+# Build outputs (si tu frontend usa Angular)
+dist/
+**/dist/

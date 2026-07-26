@@ -4,14 +4,17 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "dev": "nodemon src/app.js",
-    "start": "node src/app.js"
+    "start:auth": "node src/servers/auth.server.js",
+    "start:inventario": "node src/servers/inventario.server.js",
+    "start:ventas": "node src/servers/ventas.server.js",
+    "dev": "concurrently \"npm:start:auth\" \"npm:start:inventario\" \"npm:start:ventas\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "concurrently": "^10.0.3",
     "nodemon": "^3.1.14"
   },
   "dependencies": {
@@ -23,9 +26,12 @@
     "express": "^5.2.1",
     "google-auth-library": "^10.9.0",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^9.0.3",
+    "pdfkit": "^0.19.1",
     "pg": "^8.22.0",
     "swagger-jsdoc": "^6.3.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "twilio": "^6.0.2"
   },
   "eslintConfig": {
     "extends": "standard"

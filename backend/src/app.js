@@ -7,6 +7,11 @@ import swaggerUi from 'swagger-ui-express';
 import { PORT } from './config.js';
 import authRoutes from './routes/auth.routes.js';
 import configRoutes from './routes/config.routes.js';
+import productosRoutes from './routes/productos.routes.js';
+import marcasRoutes from './routes/marcas.routes.js';
+import proveedorRoutes from './routes/proveedor.routes.js';
+import ventasRoutes from './routes/ventas.routes.js';
+
 
 const app = express();
 
@@ -40,6 +45,11 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // ---- Rutas ----
 app.use('/api', authRoutes);
 app.use('/api', configRoutes);
+app.use('/api/productos', productosRoutes);
+app.use('/api/marcas', marcasRoutes);
+app.use('/api/proveedor', proveedorRoutes);
+app.use('/api/ventas', ventasRoutes);
+
 
 /**
  * @swagger
