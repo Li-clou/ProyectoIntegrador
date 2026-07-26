@@ -93,6 +93,14 @@ app.get('/', (req, res) => {
     res.send('Hello, integradora!');
 });
 
+app.use((err, req, res, next) => {
+    console.error("Error detectado en el servidor:", err);
+    res.status(500).json({ 
+        error: 'Ocurrió un error en el servidor', 
+        detalle: err.message 
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     console.log(`Docs en http://localhost:${PORT}/api-docs`);
