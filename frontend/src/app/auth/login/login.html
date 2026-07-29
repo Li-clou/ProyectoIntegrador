@@ -1,13 +1,13 @@
 <!-- ============================================================
      DIV PADRE (contenedor raíz de toda la pantalla)
-     - Ocupa toda la pantalla (min-h-screen) con el fondo morado degradado.
+     - Ocupa toda la pantalla (min-h-screen) con fondo café claro.
      - flex-col en móvil / flex-row en desktop (lg:).
      - items-center: centra verticalmente a sus 2 hijos (izquierdo y derecho)
        como bloques completos, uno respecto al otro.
      - justify-between: separa esos 2 hijos hacia los extremos izq/der.
      ============================================================ -->
 <div
-  class="min-h-screen w-full bg-gradient-to-br from-[#9B6F4F] via-[#6F4E37] to-[#463020] flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 lg:px-20 py-10 gap-10">
+  class="min-h-screen w-full bg-[#f6d9c6] flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 lg:px-20 py-10 gap-10">
 
   <!-- ============================================================
        DIV IZQUIERDO 
@@ -17,38 +17,38 @@
     <!-- Marca:  nombre "Kunibo" -->
     <div class="flex items-center gap-3">
       <div>
-        <p class="text-white font-bold text-9xl leading-tight">Kunibo<span class="align-super text-xs">™</span></p>
-        <p class="text-white/60 text-4xl">Bienvenido de vuelta</p>
+        <p class="text-[#20140C] font-bold text-9xl leading-tight">Kunibo<span class="align-super text-xs">™</span></p>
+        <p class="text-[#20140C]/60 text-4xl">Bienvenido de vuelta</p>
 
-        <h1 class="text-white text-6xl">Ingresa a tu cuenta </h1>
+        <h1 class="text-[#20140C] text-6xl">Ingresa a tu cuenta </h1>
       </div>
     </div>
 
   </div>
   <!-- DIV DERECHO (hijo #2 del padre)-->
-  <div class="w-full lg:w-2/3 bg-white/10 backdrop-blur-md rounded-3xl p-8 sm:p-10 shrink-0">
+  <div class="w-full lg:w-2/3 bg-white/60 backdrop-blur-md rounded-3xl p-8 sm:p-10 shrink-0">
     <!-- ============================================================
          FORMULARIO DE LOGIN
          ============================================================ -->
-    <div class="w-full  bg-white/10 backdrop-blur-md rounded-3xl p-8 sm:p-10 shrink-0">
+    <div class="w-full bg-white/60 backdrop-blur-md rounded-3xl p-8 sm:p-10 shrink-0">
 
 
-      <p class="text-white text-6xl font-bold mb-6 text-center ">Iniciar sesión</p>
+      <p class="text-[#20140C] text-6xl font-bold mb-6 text-center ">Iniciar sesión</p>
 
       <div *ngIf="errorMsg"
-        class="mb-4 text-sm text-red-200 bg-red-500/20 border border-red-400/40 rounded-lg px-3 py-2">
+        class="mb-4 text-sm text-red-700 bg-red-100 border border-red-300 rounded-lg px-3 py-2">
         {{ errorMsg }}
       </div>
 
       <div class="mb-4">
-        <p class="text-white/70 text-2xl font-semibold mb-2">Nombre de usuario</p>
+        <p class="text-[#20140C]/70 text-2xl font-semibold mb-2">Nombre de usuario</p>
         <div class="relative">
 
           <input type="text" id="usuario" [(ngModel)]="usuario" name="usuario"
-            class="w-full bg-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-cyan-300 border border-white/10"
+            class="w-full bg-white text-[#20140C] placeholder-[#20140C]/40 rounded-xl px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-[#6F4E37]/40 border border-[#20140C]/10"
             placeholder="Juan Gabriel" />
 
-          <div class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50">
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 text-[#20140C]/50">
 
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
 
@@ -63,15 +63,15 @@
 
       <div class="mb-3">
 
-        <p class="text-white/70 text-2xl font-semibold mb-2">Tu contraseña</p>
+        <p class="text-[#20140C]/70 text-2xl font-semibold mb-2">Tu contraseña</p>
 
         <div class="relative">
           <input [type]="mostrarPassword ? 'text' : 'password'" id="password" [(ngModel)]="password" name="password"
-            class="w-full bg-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-cyan-300 border border-white/10"
+            class="w-full bg-white text-[#20140C] placeholder-[#20140C]/40 rounded-xl px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-[#6F4E37]/40 border border-[#20140C]/10"
             placeholder="••••••••••••" />
 
           <div id="pwToggle" (click)="mostrarPassword = !mostrarPassword"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 cursor-pointer">
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-[#20140C]/50 cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
               <path
                 d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
@@ -87,28 +87,28 @@
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-2">
           <input type="checkbox" id="remember"
-            class="w-4 h-4 rounded-full appearance-none bg-white/20 border border-white/40 checked:bg-cyan-400 checked:border-cyan-400 cursor-pointer transition" />
-          <p class="text-white/70 text-2xl cursor-pointer">Recordarme</p>
+            class="w-4 h-4 rounded-full appearance-none bg-white border border-[#20140C]/30 checked:bg-[#6F4E37] checked:border-[#6F4E37] cursor-pointer transition" />
+          <p class="text-[#20140C]/70 text-2xl cursor-pointer">Recordarme</p>
         </div>
-        <p class="text-white/70 text-2xl cursor-pointer hover:text-white transition">¿Olvidaste tu contraseña?</p>
+        <p class="text-[#20140C]/70 text-2xl cursor-pointer hover:text-[#20140C] transition">¿Olvidaste tu contraseña?</p>
       </div>
 
       <button type="button" id="submitBtn" (click)="onLogin()" [disabled]="cargando"
-        class="w-full bg-gradient-to-r from-[#6F4E37] to-[#4B2E2E] rounded-xl py-3 text-center cursor-pointer hover:opacity-90 transition select-none mb-4 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="w-full bg-[#6F4E37] rounded-xl py-3 text-center cursor-pointer hover:bg-[#5a3f2c] transition select-none mb-4 disabled:opacity-50 disabled:cursor-not-allowed">
         <span *ngIf="!cargando" class="text-white text-lg font-semibold">Entrar</span>
         <span *ngIf="cargando" class="text-white text-lg font-semibold">Verificando...</span>
       </button>
 
-      <p class="text-center text-white/60 text-base mb-3">¿No tienes cuenta?</p>
+      <p class="text-center text-[#20140C]/60 text-base mb-3">¿No tienes cuenta?</p>
 
       <button type="button" (click)="onRegistrarme()"
-        class="w-full border border-white/30 text-white font-bold text-lg rounded-xl py-3 text-center cursor-pointer hover:bg-white/10 transition">
+        class="w-full border border-[#20140C]/30 text-[#20140C] font-bold text-lg rounded-xl py-3 text-center cursor-pointer hover:bg-[#20140C]/5 transition">
         Registrarme
       </button>
       <div class="flex items-center gap-3 my-4">
-        <div class="flex-1 h-px bg-white/20"></div>
-        <p class="text-white/50 text-sm">o continúa con</p>
-        <div class="flex-1 h-px bg-white/20"></div>
+        <div class="flex-1 h-px bg-[#20140C]/15"></div>
+        <p class="text-[#20140C]/50 text-sm">o continúa con</p>
+        <div class="flex-1 h-px bg-[#20140C]/15"></div>
       </div>
 
       <div id="googleBtn" class="flex justify-center mb-4"></div>

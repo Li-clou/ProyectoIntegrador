@@ -1,0 +1,93 @@
+<!-- Fondo desenfocado que cubre toda la pantalla -->
+<div (click)="cerrar.emit()"
+  class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 transition-opacity"></div>
+
+<!-- Panel deslizante desde la derecha -->
+<aside
+  class="fixed inset-y-0 right-0 z-50 w-full sm:w-[560px] bg-white shadow-2xl rounded-l-3xl flex flex-col animate-[slideIn_0.25s_ease-out]">
+
+  <!-- Encabezado -->
+  <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+    <h2 class="text-[#20140C] text-xl font-bold">Tu orden</h2>
+    <button type="button" (click)="cerrar.emit()"
+      class="text-slate-400 hover:text-slate-700 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.5" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Lista de productos -->
+  <div class="flex-1 overflow-y-auto px-8 py-4">
+
+    <div *ngIf="cart.items().length === 0" class="text-center text-slate-400 mt-10">
+      No hay productos en tu orden
+    </div>
+
+    <div *ngFor="let item of cart.items()"
+      class="flex items-center justify-between py-3 border-b border-slate-50">
+      <div class="min-w-0">
+        <p class="text-[#20140C] font-semibold text-sm truncate">{{ item.nombre }}</p>
+        <p class="text-slate-400 text-xs capitalize">{{ item.tamano }} · x{{ item.cantidad }}</p>
+      </div>
+      <div class="flex items-center gap-3 shrink-0">
+        <p class="text-[#6F4E37] font-bold text-sm">
+          ${{ (item.precioUnitario * item.cantidad).toFixed(2) }}
+        </p>
+        <button type="button" (click)="cart.quitar(item.idProducto, item.tamano)"
+          class="text-slate-300 hover:text-red-500 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Total + método de pago + confirmar -->
+  <div class="border-t border-slate-100 px-8 py-6 space-y-4">
+
+    <div class="flex items-center justify-between">
+      <p class="text-slate-500 text-sm">Total</p>
+      <p class="text-[#20140C] text-2xl font-bold">${{ cart.total().toFixed(2) }}</p>
+    </div>
+
+    <div>
+      <p class="text-slate-700 text-sm font-semibold mb-2">Método de pago</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button type="button" (click)="seleccionarMetodo('credito')"
+          class="py-2.5 rounded-xl text-sm font-semibold border transition"
+          [ngClass]="metodoPago === 'credito'
+            ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
+            : 'bg-white text-slate-500 border-slate-200'">
+          Crédito
+        </button>
+        <button type="button" (click)="seleccionarMetodo('transferencia')"
+          class="py-2.5 rounded-xl text-sm font-semibold border transition"
+          [ngClass]="metodoPago === 'transferencia'
+            ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
+            : 'bg-white text-slate-500 border-slate-200'">
+          Transferencia
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="errorMsg" class="text-sm text-red-700 bg-red-100 border border-red-300 rounded-lg px-3 py-2">
+      {{ errorMsg }}
+    </div>
+
+    <div *ngIf="exito" class="text-sm text-emerald-700 bg-emerald-100 border border-emerald-300 rounded-lg px-3 py-2">
+      Venta registrada correctamente
+    </div>
+
+    <button type="button" (click)="confirmarVenta()" [disabled]="procesando || cart.items().length === 0"
+      class="w-full bg-[#6F4E37] text-white font-semibold rounded-xl py-3 hover:bg-[#5a3f2c] transition disabled:opacity-50 disabled:cursor-not-allowed">
+      {{ procesando ? 'Procesando...' : 'Confirmar venta' }}
+    </button>
+  </div>
+
+</aside>

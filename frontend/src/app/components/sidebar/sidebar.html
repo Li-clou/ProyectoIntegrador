@@ -1,0 +1,40 @@
+<!-- Fondo oscuro detrás de la sidebar en móvil, cierra al tocar afuera -->
+<div *ngIf="abierta" (click)="cerrar.emit()" class="fixed inset-0 bg-black/40 z-30 lg:hidden"></div>
+
+<aside
+  class="fixed lg:static inset-y-0 left-0 z-40 w-72 h-screen lg:h-screen shrink-0 bg-[#f7cdb1] flex flex-col transition-transform duration-200 ease-out lg:translate-x-0"
+  [class.-translate-x-full]="!abierta"
+  [class.translate-x-0]="abierta">
+
+  <!-- Marca -->
+  <div class="px-6 pt-8 pb-6 border-b border-[#20140C]/10 shrink-0">
+    <p class="text-[#20140C] font-bold text-6xl leading-none">Kunibo<span class="align-super text-xs">™</span></p>
+    <p class="text-[#20140C]/50 text-xs mt-1">Punto de venta</p>
+  </div>
+
+  <!-- Navegación -->
+  <nav class="flex-1 px-3 py-6 flex flex-col gap-1 overflow-y-auto">
+    <a *ngFor="let item of menu" [routerLink]="item.ruta" routerLinkActive="bg-[#6F4E37]/15 text-[#20140C]"
+      (click)="onNavegar()"
+      class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#20140C]/60 hover:bg-[#6F4E37]/10 hover:text-[#20140C] transition text-sm font-medium">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.5" class="w-5 h-5 shrink-0">
+        <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.icono" />
+      </svg>
+      {{ item.etiqueta }}
+    </a>
+  </nav>
+
+  <!-- Cerrar sesión -->
+  <div class="px-3 pb-6 pt-3 border-t border-[#20140C]/10 shrink-0">
+    <button type="button" (click)="onCerrarSesion()" [disabled]="cerrandoSesion"
+      class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#20140C]/60 hover:bg-[#6F4E37]/10 hover:text-[#20140C] transition text-sm font-medium disabled:opacity-50">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.5" class="w-5 h-5 shrink-0">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+      </svg>
+      {{ cerrandoSesion ? 'Cerrando sesión...' : 'Cerrar sesión' }}
+    </button>
+  </div>
+</aside>

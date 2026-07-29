@@ -1,0 +1,22 @@
+<div class="h-screen w-full flex bg-slate-50 overflow-hidden">
+
+  <app-sidebar [abierta]="sidebarAbierta()" (cerrar)="cerrarSidebar()" />
+
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <header class="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-slate-200">
+      <button type="button" (click)="alternarSidebar()" class="text-slate-600">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.5" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+        </svg>
+      </button>
+      <p class="text-[#4c2a8f] font-bold">Kunibo<span class="align-super text-[10px]">™</span></p>
+    </header>
+
+    <!-- Ya SIN padding aquí -->
+    <main class="flex-1 overflow-y-auto">
+      <router-outlet />
+    </main>
+  </div>
+</div>
