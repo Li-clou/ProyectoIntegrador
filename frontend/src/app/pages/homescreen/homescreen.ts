@@ -1,9 +1,12 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, OnInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common'; 
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router'; 
+import { HttpClient, HttpClientModule } from '@angular/common/http'; // <-- Importación para conectar con el backend
 import Swal from 'sweetalert2';
 import { CartService } from '../../services/cart.service';
 import { CheckoutPanel } from '../../components/checkout-panel/checkout-panel';
+import { AuthService } from '../../services/auth.services'; 
 
 interface Producto {
   id: number;
@@ -19,14 +22,29 @@ interface Producto {
 @Component({
   selector: 'app-homescreen',
   standalone: true,
-  imports: [CommonModule, FormsModule, CheckoutPanel],
+  // Se agregó HttpClientModule a los imports
+  imports: [CommonModule, FormsModule, RouterModule, DatePipe, HttpClientModule], 
   templateUrl: './homescreen.html',
   styleUrl: './homescreen.css',
 })
-export class Homescreen {
+export class Homescreen implements OnInit {
   terminoBusqueda = '';
   panelAbierto = signal(false);
 
+  // --- VARIABLES DEL HEADER Y DASHBOARD ---
+  usuarioActual: string = 'Cargando...';
+  fechaActual: Date = new Date();
+
+  // Objeto para almacenar las estadísticas reales que vienen de PostgreSQL
+  stats: any = {
+    ventasDia: 0,
+    transacciones: 0,
+    cajerosActivos: 0,
+    productosVendidos: 0,
+    inventarioBajo: 0
+  };
+
+  // --- CATÁLOGO DE PRODUCTOS ---
   productos: Producto[] = [
     {
       id: 1,
@@ -130,7 +148,47 @@ export class Homescreen {
     },
   ];
 
-  constructor(public cart: CartService) {}
+  constructor(
+    public cart: CartService,
+    private authService: AuthService,
+    private router: Router,
+    private http: HttpClient // <-- Inyectamos HttpClient para poder hacer la petición GET
+  ) {}
+
+  ngOnInit(): void {
+    // 1. Validar la sesión y obtener el nombre del usuario
+    this.authService.me().subscribe({
+      next: (res) => {
+        this.usuarioActual = res.usuario.nombre_us || 'Administrador';
+      },
+      error: () => {
+        this.router.navigate(['/inicio-sesion']);
+      }
+    });
+
+    // 2. Cargar las estadísticas del dashboard
+    this.cargarEstadisticas();
+  }
+
+  // --- FUNCIÓN PARA CONECTAR AL BACKEND Y TRAER LAS MÉTRICAS ---
+  cargarEstadisticas(): void {
+    this.http.get('http://localhost:3000/api/dashboard/stats', { withCredentials: true })
+      .subscribe({
+        next: (res: any) => {
+          this.stats = res;
+        },
+        error: (err) => console.error('Error al cargar métricas del dashboard:', err)
+      });
+  }
+
+  cerrarSesion(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/inicio-sesion']);
+      },
+      error: (err) => console.error('Error al cerrar sesión', err)
+    });
+  }
 
   abrirFiltro(): void {
     console.log('Filtrando con:', this.terminoBusqueda);

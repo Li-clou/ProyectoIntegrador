@@ -9,7 +9,7 @@ export async function crearUsuario({ nombre_us, ap_us, am_us, direccion, telefon
 
 export async function buscarPorUsuario(usuario) {
     const resultado = await pool.query(
-        'SELECT id_usuario, nombre_us, ap_us, am_us, direccion, telefono, usuario, password FROM usuarios WHERE usuario = $1',
+        'SELECT id_usuario, nombre_us, ap_us, am_us, direccion, telefono, usuario, password, rol FROM usuarios WHERE usuario = $1',
         [usuario]
     );
     return resultado.rows[0] || null;

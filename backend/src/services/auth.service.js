@@ -32,10 +32,11 @@ export async function loginUsuario({ usuario, password }) {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return null;
 
+    // AÑADIDO: 'rol' al payload y subimos a '8h' para cubrir un turno de caja
     const token = jwt.sign(
-        { id_usuario: user.id_usuario, usuario: user.usuario },
+        { id_usuario: user.id_usuario, usuario: user.usuario, rol: user.rol },
         process.env.JWT_SECRET,
-        { expiresIn: '1h' }
+        { expiresIn: '8h' }
     );
 
     return {
@@ -47,7 +48,8 @@ export async function loginUsuario({ usuario, password }) {
             am_us: user.am_us,
             direccion: user.direccion,
             telefono: user.telefono,
-            usuario: user.usuario
+            usuario: user.usuario,
+            rol: user.rol
         }
     };
 }
@@ -76,10 +78,11 @@ export async function loginConGoogle(idToken) {
         }
     }
 
+    // AÑADIDO: 'rol' al payload y subimos a '8h'
     const token = jwt.sign(
-        { id_usuario: user.id_usuario, usuario: user.usuario },
+        { id_usuario: user.id_usuario, usuario: user.usuario, rol: user.rol },
         process.env.JWT_SECRET,
-        { expiresIn: '1h' }
+        { expiresIn: '8h' }
     );
 
     return {
@@ -91,6 +94,7 @@ export async function loginConGoogle(idToken) {
             am_us: user.am_us,
             usuario: user.usuario,
             email: user.email,
+            rol: user.rol
         }
     };
 }

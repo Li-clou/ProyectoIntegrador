@@ -12,9 +12,9 @@ import { AuthService } from '../../services/auth.services';
 })
 export class RegistroCliente {
 
-  nombre: string = '';
-  apellidoPaterno: string = '';
-  apellidoMaterno: string = '';
+  nombre_us: string = '';
+  ap_us: string = '';
+  am_us: string = '';
   direccion: string = '';
   telefono: string = '';
   usuario: string = '';
@@ -34,16 +34,18 @@ export class RegistroCliente {
   onRegistrar(): void {
     this.errorMsg = '';
 
-    if (!this.validarFormulario()) {
+    // Validamos únicamente si las contraseñas coinciden
+    if (this.password !== this.confirmarPassword) {
+      this.errorMsg = 'Las contraseñas no coinciden';
       return;
     }
 
     this.cargando = true;
 
     this.authService.registrarCliente({
-      nombre_us: this.nombre,
-      ap_us: this.apellidoPaterno,
-      am_us: this.apellidoMaterno,
+      nombre_us: this.nombre_us,
+      ap_us: this.ap_us,
+      am_us: this.am_us,
       direccion: this.direccion,
       telefono: this.telefono,
       usuario: this.usuario,
@@ -60,21 +62,7 @@ export class RegistroCliente {
     });
   }
 
-  private validarFormulario(): boolean {
-    if (!this.nombre || !this.apellidoPaterno || !this.usuario || !this.password) {
-      this.errorMsg = 'Nombre, apellido paterno, usuario y contraseña son obligatorios';
-      return false;
-    }
-
-    if (this.password !== this.confirmarPassword) {
-      this.errorMsg = 'Las contraseñas no coinciden';
-      return false;
-    }
-
-    return true;
-  }
-
-  onIrALogin(): void {
+  onVolverLogin(): void {
     this.router.navigate(['/inicio-sesion']);
   }
 }

@@ -11,7 +11,7 @@ import productosRoutes from './routes/productos.routes.js';
 import marcasRoutes from './routes/marcas.routes.js';
 import proveedorRoutes from './routes/proveedor.routes.js';
 import ventasRoutes from './routes/ventas.routes.js';
-
+import dashboardRoutes from './routes/dashboard.routes.js';
 
 const app = express();
 
@@ -30,7 +30,7 @@ const swaggerOptions = {
         info: {
             title: "API de Usuarios",
             version: "1.0.0",
-            description: "Documentación de las  API's",
+            description: "Documentación de las APIs",
         },
         servers: [
             { url: `http://localhost:${PORT}/api` }
@@ -50,37 +50,14 @@ app.use('/api/marcas', marcasRoutes);
 app.use('/api/proveedor', proveedorRoutes);
 app.use('/api/ventas', ventasRoutes);
 
+// ✅ CORRECCIÓN: La ruta de dashboard ya está aquí arriba, en el lugar correcto.
+app.use('/api/dashboard', dashboardRoutes);
 
 /**
  * @swagger
  * tags:
  *   name: Health
  *   description: Estado del servidor
- */
-
-/**
- * @swagger
- * /health:
- *   get:
- *     summary: Verifica que el servidor esté funcionando
- *     tags: [Health]
- *     responses:
- *       200:
- *         description: Servidor funcionando correctamente
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: ok
- *                 uptime:
- *                   type: number
- *                   example: 123.45
- *                 timestamp:
- *                   type: string
- *                   example: 2026-07-14T17:44:00.000Z
  */
 app.get('/api/health', (req, res) => {
     res.json({
@@ -89,6 +66,7 @@ app.get('/api/health', (req, res) => {
         timestamp: new Date().toISOString()
     });
 });
+
 app.get('/', (req, res) => {
     res.send('Hello, integradora!');
 });

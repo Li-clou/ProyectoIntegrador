@@ -1,117 +1,93 @@
-<!-- ============================================================
-     DIV PADRE (contenedor raíz de toda la pantalla)
-     - Ocupa toda la pantalla (min-h-screen) con fondo café claro.
-     - flex-col en móvil / flex-row en desktop (lg:).
-     - items-center: centra verticalmente a sus 2 hijos (izquierdo y derecho)
-       como bloques completos, uno respecto al otro.
-     - justify-between: separa esos 2 hijos hacia los extremos izq/der.
-     ============================================================ -->
-<div
-  class="min-h-screen w-full bg-[#f6d9c6] flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 lg:px-20 py-10 gap-10">
+<!-- CONTENEDOR PRINCIPAL: Fijo en pantalla, sin scroll -->
+<div class="h-screen w-full flex flex-col lg:flex-row font-sans text-stone-800 bg-[#FDFBF7] overflow-hidden">
 
   <!-- ============================================================
-       DIV IZQUIERDO 
+       MITAD IZQUIERDA: Marca e Imagen (Fija)
        ============================================================ -->
-  <div class="w-full lg:w-1/3 flex flex-col gap-8 max-w-xl">
-
-    <!-- Marca:  nombre "Kunibo" -->
-    <div class="flex items-center gap-3">
-      <div>
-        <p class="text-[#20140C] font-bold text-9xl leading-tight">Kunibo<span class="align-super text-xs">™</span></p>
-        <p class="text-[#20140C]/60 text-4xl">Bienvenido de vuelta</p>
-
-        <h1 class="text-[#20140C] text-6xl">Ingresa a tu cuenta </h1>
-      </div>
+  <div class="hidden lg:flex w-1/2 relative bg-stone-900 items-center justify-center overflow-hidden shrink-0">
+    <img src="/Kunibo.png" 
+     class="absolute inset-0 w-full h-full object-cover opacity-50" 
+     alt="Fondo de cafetería">
+    
+    <div class="relative z-10 flex flex-col items-center text-center mt-[-10%]">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16 text-[#FDFBF7] mb-4">
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+      </svg>
+      <h1 class="text-[#FDFBF7] text-6xl font-serif font-bold tracking-wide mb-3">Kunibo</h1>
+      <p class="text-[#FDFBF7]/80 text-xs tracking-[0.3em] uppercase mb-8">• CAFÉ & EXPERIENCIAS •</p>
+      <p class="text-[#FDFBF7] text-lg font-light leading-relaxed">
+        Más que café,<br>momentos que se quedan.
+      </p>
     </div>
-
   </div>
-  <!-- DIV DERECHO (hijo #2 del padre)-->
-  <div class="w-full lg:w-2/3 bg-white/60 backdrop-blur-md rounded-3xl p-8 sm:p-10 shrink-0">
-    <!-- ============================================================
-         FORMULARIO DE LOGIN
-         ============================================================ -->
-    <div class="w-full bg-white/60 backdrop-blur-md rounded-3xl p-8 sm:p-10 shrink-0">
 
+  <!-- ============================================================
+       MITAD DERECHA: Formulario de Login (Sin registro público)
+       ============================================================ -->
+  <div class="w-full lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-12 relative overflow-hidden">
+    
+    <div class="absolute top-0 right-0 w-64 h-64 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRo dD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRo dD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRo dD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRo dD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRo dD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik0yMCAyMGMtNS41IDAtMTAtNC41LTEwLTEwUzE0LjUgMCAyMCAwczEwIDQuNSAxMCAxMC00LjUgMTAtMTAgMTB6IiBmaWxsPSIjZjRmMWVhIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-30 pointer-events-none"></div>
 
-      <p class="text-[#20140C] text-6xl font-bold mb-6 text-center ">Iniciar sesión</p>
+    <div class="w-full max-w-lg bg-white rounded-[2rem] p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative z-10">
+      
+      <div class="text-center mb-6">
+        <h2 class="text-3xl font-bold text-[#4A3B32] mb-1">Acceso al Sistema</h2>
+        <p class="text-stone-500 text-xs sm:text-sm">Personal autorizado (Administradores y Cajeros)</p>
+      </div>
 
-      <div *ngIf="errorMsg"
-        class="mb-4 text-sm text-red-700 bg-red-100 border border-red-300 rounded-lg px-3 py-2">
+      <div *ngIf="errorMsg" class="mb-4 text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
         {{ errorMsg }}
       </div>
 
-      <div class="mb-4">
-        <p class="text-[#20140C]/70 text-2xl font-semibold mb-2">Nombre de usuario</p>
-        <div class="relative">
-
-          <input type="text" id="usuario" [(ngModel)]="usuario" name="usuario"
-            class="w-full bg-white text-[#20140C] placeholder-[#20140C]/40 rounded-xl px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-[#6F4E37]/40 border border-[#20140C]/10"
-            placeholder="Juan Gabriel" />
-
-          <div class="absolute right-3 top-1/2 -translate-y-1/2 text-[#20140C]/50">
-
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-
-              <path fill-rule="evenodd"
-                d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-                clip-rule="evenodd" />
-            </svg>
-
+      <form (ngSubmit)="onLogin()" ngNativeValidate class="space-y-4">
+        
+        <div>
+          <label for="usuario" class="block text-[#4A3B32] text-xs font-bold mb-1">Usuario *</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+            </div>
+            <input type="text" id="usuario" [(ngModel)]="usuario" name="usuario" required
+                   class="w-full pl-10 pr-3 py-2.5 bg-[#FDFBF7] border border-stone-200 text-stone-800 text-xs sm:text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32] transition-colors placeholder:text-stone-400"
+                   placeholder="Ingresa tu usuario" />
           </div>
         </div>
-      </div>
 
-      <div class="mb-3">
-
-        <p class="text-[#20140C]/70 text-2xl font-semibold mb-2">Tu contraseña</p>
-
-        <div class="relative">
-          <input [type]="mostrarPassword ? 'text' : 'password'" id="password" [(ngModel)]="password" name="password"
-            class="w-full bg-white text-[#20140C] placeholder-[#20140C]/40 rounded-xl px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-[#6F4E37]/40 border border-[#20140C]/10"
-            placeholder="••••••••••••" />
-
-          <div id="pwToggle" (click)="mostrarPassword = !mostrarPassword"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-[#20140C]/50 cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-              <path
-                d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
-              <path
-                d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z" />
-              <path
-                d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z" />
-            </svg>
+        <div>
+          <label for="password" class="block text-[#4A3B32] text-xs font-bold mb-1">Contraseña *</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+            </div>
+            <input [type]="mostrarPassword ? 'text' : 'password'" id="password" [(ngModel)]="password" name="password" required
+                   class="w-full pl-10 pr-10 py-2.5 bg-[#FDFBF7] border border-stone-200 text-stone-800 text-xs sm:text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32] transition-colors placeholder:text-stone-400"
+                   placeholder="Ingresa tu contraseña" />
+            
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-stone-400 hover:text-[#4A3B32] transition-colors" (click)="mostrarPassword = !mostrarPassword">
+              <svg *ngIf="!mostrarPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              <svg *ngIf="mostrarPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-2">
-          <input type="checkbox" id="remember"
-            class="w-4 h-4 rounded-full appearance-none bg-white border border-[#20140C]/30 checked:bg-[#6F4E37] checked:border-[#6F4E37] cursor-pointer transition" />
-          <p class="text-[#20140C]/70 text-2xl cursor-pointer">Recordarme</p>
+        <div class="flex items-center justify-between text-xs pt-1">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="remember" class="w-3.5 h-3.5 rounded appearance-none bg-[#FDFBF7] border border-stone-300 checked:bg-[#4A3B32] checked:border-[#4A3B32] cursor-pointer transition-colors relative after:content-[''] after:absolute after:hidden checked:after:block after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-1.5 after:h-1.5 after:bg-white after:rounded-sm" />
+            <label for="remember" class="text-stone-500 cursor-pointer select-none">Recordarme</label>
+          </div>
+          <a href="javascript:void(0)" (click)="recuperarPassword()" class="text-[#8B5A33] hover:text-[#4A3B32] font-semibold transition-colors">¿Olvidaste tu contraseña?</a>
         </div>
-        <p class="text-[#20140C]/70 text-2xl cursor-pointer hover:text-[#20140C] transition">¿Olvidaste tu contraseña?</p>
-      </div>
 
-      <button type="button" id="submitBtn" (click)="onLogin()" [disabled]="cargando"
-        class="w-full bg-[#6F4E37] rounded-xl py-3 text-center cursor-pointer hover:bg-[#5a3f2c] transition select-none mb-4 disabled:opacity-50 disabled:cursor-not-allowed">
-        <span *ngIf="!cargando" class="text-white text-lg font-semibold">Entrar</span>
-        <span *ngIf="cargando" class="text-white text-lg font-semibold">Verificando...</span>
-      </button>
+        <button type="submit" [disabled]="cargando"
+                class="w-full bg-[#4A3B32] hover:bg-[#382b24] text-white rounded-xl py-3 font-semibold text-xs sm:text-sm transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center h-11 mt-2">
+          <span *ngIf="!cargando">Iniciar sesión</span>
+          <svg *ngIf="cargando" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        </button>
 
-      <p class="text-center text-[#20140C]/60 text-base mb-3">¿No tienes cuenta?</p>
+      </form>
 
-      <button type="button" (click)="onRegistrarme()"
-        class="w-full border border-[#20140C]/30 text-[#20140C] font-bold text-lg rounded-xl py-3 text-center cursor-pointer hover:bg-[#20140C]/5 transition">
-        Registrarme
-      </button>
-      <div class="flex items-center gap-3 my-4">
-        <div class="flex-1 h-px bg-[#20140C]/15"></div>
-        <p class="text-[#20140C]/50 text-sm">o continúa con</p>
-        <div class="flex-1 h-px bg-[#20140C]/15"></div>
-      </div>
-
-      <div id="googleBtn" class="flex justify-center mb-4"></div>
     </div>
   </div>
 </div>
