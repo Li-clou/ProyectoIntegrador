@@ -15,3 +15,9 @@ export function verificarToken(req, res, next) {
         return res.status(401).json({ error: 'Token invalido o expirado' });
     }
 }
+export function esAdmin(req, res, next) {
+    if (!req.usuario || req.usuario.rol !== 'admin') {
+        return res.status(403).json({ error: 'Acceso restringido a administradores' });
+    }
+    next();
+}

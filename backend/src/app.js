@@ -12,10 +12,10 @@ import marcasRoutes from './routes/marcas.routes.js';
 import proveedorRoutes from './routes/proveedor.routes.js';
 import ventasRoutes from './routes/ventas.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
+import usuariosRoutes from './routes/usuarios.routes.js'; // 👈 nuevo
 
 const app = express();
 
-// ---- Middlewares base ----
 app.use(cors({
     origin: 'http://localhost:4200',
     credentials: true
@@ -23,7 +23,6 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
-// ---- Swagger ----
 const swaggerOptions = {
     definition: {
         openapi: "3.0.0",
@@ -42,41 +41,24 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ---- Rutas ----
 app.use('/api', authRoutes);
 app.use('/api', configRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/marcas', marcasRoutes);
 app.use('/api/proveedor', proveedorRoutes);
 app.use('/api/ventas', ventasRoutes);
-
-// ✅ CORRECCIÓN: La ruta de dashboard ya está aquí arriba, en el lugar correcto.
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/usuarios', usuariosRoutes); // 👈 nuevo
 
-/**
- * @swagger
- * tags:
- *   name: Health
- *   description: Estado del servidor
- */
 app.get('/api/health', (req, res) => {
-    res.json({
-        status: 'ok',
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString()
-    });
+    res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
 });
 
-app.get('/', (req, res) => {
-    res.send('Hello, integradora!');
-});
+app.get('/', (req, res) => res.send('Hello, integradora!'));
 
 app.use((err, req, res, next) => {
     console.error("Error detectado en el servidor:", err);
-    res.status(500).json({ 
-        error: 'Ocurrió un error en el servidor', 
-        detalle: err.message 
-    });
+    res.status(500).json({ error: 'Ocurrió un error en el servidor', detalle: err.message });
 });
 
 app.listen(PORT, () => {

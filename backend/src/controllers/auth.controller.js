@@ -38,7 +38,9 @@ export async function login(req, res) {
         // 2. LÓGICA DE TURNOS (SOLO PARA CAJEROS)
         // ==========================================
         const user = resultado.usuario; // Extraemos la info del usuario devuelta por tu servicio
-
+        if (!user.rol) {
+            return res.status(500).json({ error: 'El usuario no tiene un rol asignado. Contacta al administrador.' });
+        }
         if (user && user.rol === 'cajero') {
             // Verificamos si ya tiene un turno abierto
             const queryTurnoAbierto = "SELECT * FROM turnos WHERE id_usuario = $1 AND estado = 'ABIERTO'";

@@ -23,35 +23,44 @@ export class Login {
   constructor(
     private router: Router,
     private authService: AuthService
-  ) {}
+  ) { }
 
   onLogin() {
     this.errorMsg = '';
     this.cargando = true;
 
     this.authService.login({ usuario: this.usuario, password: this.password }).subscribe({
-      // Capturamos la respuesta (res) que envía el backend
       next: (res: any) => {
         this.cargando = false;
-        
-        // Extraemos el rol. Si por alguna razón no viene, asumimos cajero por seguridad.
         const rolUsuario = res?.usuario?.rol || 'cajero';
 
-        // Redirección inteligente basada en el rol
-        if (rolUsuario === 'admin') {
-          this.router.navigate(['/home']); // El admin va a su panel de métricas/inventario
-        } else {
-          // El cajero va directo a la terminal de punto de venta
-          // Nota: Asegúrate de tener la ruta '/ventas' habilitada en tus app.routes.ts
-          this.router.navigate(['/home']); 
-        }
+        Swal.fire({
+          icon: 'success',
+          title: '¡Bienvenido!',
+          text: 'Iniciaste sesión correctamente',
+          confirmButtonColor: '#4A3B32',
+          timer: 1800,
+          timerProgressBar: true,
+          customClass: {
+            popup: 'rounded-3xl'
+          }
+        }).then(() => {
+          if (rolUsuario === 'admin') {
+            this.router.navigate(['/home']);
+          } else {
+            this.router.navigate(['/home']);
+          }
+        });
       },
-      error: () => {
-        // Blindaje definitivo: detiene el loader de inmediato y muestra el mensaje sin depender de JSON alterados por antivirus.
+      error: (err: any) => {
         this.cargando = false;
-        this.errorMsg = 'Usuario o contraseña incorrectos.';
+        this.errorMsg = err.error?.error || 'Usuario o contraseña incorrectos.';
       }
     });
+  }
+
+  irARegistro(): void {
+    this.router.navigate(['/registro']);
   }
 
   async recuperarPassword() {
