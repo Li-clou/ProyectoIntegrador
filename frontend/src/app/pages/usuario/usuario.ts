@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -21,7 +21,7 @@ export class UsuariosComponent implements OnInit {
 
   busqueda = '';
   filtroRol: 'Todos' | 'admin' | 'cajero' | 'pendiente' = 'Todos';
-  
+
   // ===== NUEVA PROPIEDAD AGREGADA =====
   filtros: ('Todos' | 'admin' | 'cajero' | 'pendiente')[] = ['Todos', 'admin', 'cajero', 'pendiente'];
 
@@ -33,7 +33,7 @@ export class UsuariosComponent implements OnInit {
   private readonly REGEX_TELEFONO = /^[0-9]{10}$/;
   private readonly REGEX_USUARIO = /^[A-Za-z0-9_]+$/;
 
-  constructor(private usuariosService: UsuariosService) {}
+  constructor(private usuariosService: UsuariosService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.cargarUsuarios();
@@ -43,9 +43,15 @@ export class UsuariosComponent implements OnInit {
     this.cargando = true;
     this.usuariosService.listar().subscribe({
       next: (data) => {
+        //console.log('1. DATA:', data);
         this.usuarios = data;
+        //console.log('2. USUARIOS:', this.usuarios);
         this.aplicarFiltros();
+        //console.log('3. FILTRADOS:', this.usuariosFiltrados);
         this.cargando = false;
+        //console.log('4. CARGANDO:', this.cargando);
+        this.cdr.detectChanges();  // 👈 fuerza el repintado
+
       },
       error: (err) => {
         this.errorMsg = err.error?.error || 'No se pudieron cargar los usuarios';

@@ -20,6 +20,7 @@ export class RegistroCliente {
   telefono: string = '';
   usuario: string = '';
   password: string = '';
+  rol: 'admin' | 'cajero' | 'pendiente' = 'pendiente'; // Valor por defecto para el registro de clientes
   confirmarPassword: string = '';
 
   mostrarPassword: boolean = false;
@@ -143,7 +144,8 @@ export class RegistroCliente {
       direccion: this.direccion,
       telefono: this.telefono,
       usuario: this.usuario,
-      password: this.password
+      password: this.password,
+      rol: this.rol
     }).subscribe({
       next: () => {
         this.cargando = false;

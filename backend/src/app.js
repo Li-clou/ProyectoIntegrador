@@ -12,7 +12,7 @@ import marcasRoutes from './routes/marcas.routes.js';
 import proveedorRoutes from './routes/proveedor.routes.js';
 import ventasRoutes from './routes/ventas.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
-import usuariosRoutes from './routes/usuarios.routes.js'; // 👈 nuevo
+import usuariosRoutes from './routes/usuarios.routes.js';
 
 const app = express();
 
@@ -41,14 +41,15 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use('/api', authRoutes);
-app.use('/api', configRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/marcas', marcasRoutes);
 app.use('/api/proveedor', proveedorRoutes);
 app.use('/api/ventas', ventasRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/usuarios', usuariosRoutes); // 👈 nuevo
+app.use('/api/usuarios', usuariosRoutes); // 👈
+app.use('/api', authRoutes);
+app.use('/api', configRoutes);
+ nuevo
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });

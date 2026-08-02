@@ -2,21 +2,21 @@
 <div *ngIf="abierta" (click)="cerrar.emit()" class="fixed inset-0 bg-black/40 z-30 lg:hidden"></div>
 
 <aside
-  class="fixed lg:static inset-y-0 left-0 z-40 w-72 h-screen lg:h-screen shrink-0 bg-[#f7cdb1] flex flex-col transition-transform duration-200 ease-out lg:translate-x-0"
+  class="fixed lg:static inset-y-0 left-0 z-40 w-72 h-screen lg:h-screen shrink-0 bg-[#4A3B32] flex flex-col transition-transform duration-200 ease-out lg:translate-x-0"
   [class.-translate-x-full]="!abierta"
   [class.translate-x-0]="abierta">
 
   <!-- Marca -->
-  <div class="px-6 pt-8 pb-6 border-b border-[#20140C]/10 shrink-0">
-    <p class="text-[#20140C] font-bold text-6xl leading-none">Kunibo<span class="align-super text-xs">™</span></p>
-    <p class="text-[#20140C]/50 text-xs mt-1">Punto de venta</p>
+  <div class="px-6 pt-8 pb-6 border-b border-white/10 shrink-0">
+    <p class="text-[#FDFBF7] font-bold text-6xl leading-none">Kunibo<span class="align-super text-xs">™</span></p>
+    <p class="text-[#FDFBF7]/50 text-xs mt-1">Punto de venta</p>
   </div>
 
   <!-- Navegación -->
   <nav class="flex-1 px-3 py-6 flex flex-col gap-1 overflow-y-auto">
-    <a *ngFor="let item of menu" [routerLink]="item.ruta" routerLinkActive="bg-[#6F4E37]/15 text-[#20140C]"
+    <a *ngFor="let item of menu" [routerLink]="item.ruta" routerLinkActive="bg-white/15 text-[#FDFBF7]"
       (click)="onNavegar()"
-      class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#20140C]/60 hover:bg-[#6F4E37]/10 hover:text-[#20140C] transition text-sm font-medium">
+      class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#FDFBF7]/60 hover:bg-white/10 hover:text-[#FDFBF7] transition text-sm font-medium">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="1.5" class="w-5 h-5 shrink-0">
         <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.icono" />
@@ -26,9 +26,9 @@
   </nav>
 
   <!-- Cerrar sesión -->
-  <div class="px-3 pb-6 pt-3 border-t border-[#20140C]/10 shrink-0">
+  <div class="px-3 pb-6 pt-3 border-t border-white/10 shrink-0">
     <button type="button" (click)="onCerrarSesion()" [disabled]="cerrandoSesion"
-      class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#20140C]/60 hover:bg-[#6F4E37]/10 hover:text-[#20140C] transition text-sm font-medium disabled:opacity-50">
+      class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#FDFBF7]/60 hover:bg-white/10 hover:text-[#FDFBF7] transition text-sm font-medium disabled:opacity-50">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="1.5" class="w-5 h-5 shrink-0">
         <path stroke-linecap="round" stroke-linejoin="round"

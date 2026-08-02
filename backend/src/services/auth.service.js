@@ -14,14 +14,15 @@ const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 export async function registrarUsuario(datos) {
     const passwordHash = await bcrypt.hash(datos.password, 10);
-    const nuevo = await crearUsuario({ ...datos, passwordHash });
+    const nuevo = await crearUsuario({ ...datos, passwordHash,rol:'pendiente' });   
 
     return {
         id_usuario: nuevo.id_usuario,
         nombre_us: datos.nombre_us,
         ap_us: datos.ap_us,
         am_us: datos.am_us,
-        usuario: datos.usuario
+        usuario: datos.usuario,
+        rol: datos.rol
     };
 }
 

@@ -10,6 +10,7 @@ export interface RegistroPayload {
   telefono: string;
   usuario: string;
   password: string;
+  rol: 'admin' | 'cajero' | 'pendiente';
 }
 
 export interface LoginPayload {

@@ -29,10 +29,10 @@ const swaggerSpec = swaggerJsdoc({
 });
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use('/api', usuariosRoutes);
+app.use('/api/usuarios', usuariosRoutes);
 app.use('/api', configRoutes);
 
-app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'auth' }));
+app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'usuarios' }));
 
 app.listen(PORTH_USUARIOS, () => {
     console.log(`Usuarios service corriendo en http://localhost:${PORTH_USUARIOS}`);

@@ -6,7 +6,7 @@ import { Usuario } from '../models/usuario.models';
 @Injectable({ providedIn: 'root' })
 export class UsuariosService {
   // Ruta relativa, igual que AuthService: el proxy de Angular la
-  // reenvía a http://localhost:3000/api/usuarios
+  // reenvía a http://localhost:3003/api/usuarios
   private readonly baseUrl = '/api/usuarios';
 
   constructor(private http: HttpClient) {}
