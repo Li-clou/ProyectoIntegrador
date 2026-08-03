@@ -49,7 +49,6 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/usuarios', usuariosRoutes); // 👈
 app.use('/api', authRoutes);
 app.use('/api', configRoutes);
- nuevo
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });

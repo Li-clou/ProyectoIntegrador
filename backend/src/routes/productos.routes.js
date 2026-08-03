@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
     listar, obtener, crear, actualizar, eliminar, ajustarExistencia,
 } from "../controllers/productos.controller.js";
-import { verificarToken } from "../middlewares/auth.middleware.js";
+import { verificarToken, esAdmin } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -135,7 +135,7 @@ router.get('/:id', verificarToken, obtener);
  *       400: { description: Faltan campos obligatorios }
  *       409: { description: Código duplicado }
  */
-router.post('/', verificarToken, crear);
+router.post('/', verificarToken, esAdmin, crear);
 
 /**
  * @swagger
@@ -157,7 +157,7 @@ router.post('/', verificarToken, crear);
  *       200: { description: Producto actualizado }
  *       404: { description: Producto no encontrado }
  */
-router.put('/:id', verificarToken, actualizar);
+router.put('/:id', verificarToken, esAdmin, actualizar);
 
 /**
  * @swagger
@@ -175,7 +175,7 @@ router.put('/:id', verificarToken, actualizar);
  *       404: { description: Producto no encontrado }
  *       409: { description: Tiene ventas/compras asociadas }
  */
-router.delete('/:id', verificarToken, eliminar);
+router.delete('/:id', verificarToken, esAdmin, eliminar);
 
 /**
  * @swagger
@@ -199,6 +199,6 @@ router.delete('/:id', verificarToken, eliminar);
  *       400: { description: Stock insuficiente o datos inválidos }
  *       404: { description: Producto no encontrado }
  */
-router.patch('/:id/stock', verificarToken, ajustarExistencia);
+router.patch('/:id/stock', verificarToken, esAdmin, ajustarExistencia);
 
 export default router;

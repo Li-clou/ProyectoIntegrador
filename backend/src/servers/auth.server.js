@@ -7,6 +7,9 @@ import swaggerUi from 'swagger-ui-express';
 import { PORT_AUTH } from '../config.js';
 import authRoutes from '../routes/auth.routes.js';
 import configRoutes from '../routes/config.routes.js';
+import dashboardRoutes from '../routes/dashboard.routes.js';
+import turnosRoutes from '../routes/turnos.routes.js';
+import clientesRoutes from '../routes/clientes.routes.js';
 
 const app = express();
 
@@ -31,6 +34,9 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api', authRoutes);
 app.use('/api', configRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/turnos', turnosRoutes);
+app.use('/api/clientes', clientesRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'auth' }));
 

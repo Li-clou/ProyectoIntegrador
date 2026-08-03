@@ -136,3 +136,38 @@ export async function obtenerVentaCompleta(id_venta) {
 
     return { ...ventaResult.rows[0], items: itemsResult.rows };
 }
+
+export async function listarVentas({ desde, hasta } = {}) {
+    const valores = [];
+    const condiciones = [];
+    if (desde) { valores.push(desde); condiciones.push(`v.fecha_v >= $${valores.length}::date`); }
+    if (hasta) { valores.push(hasta); condiciones.push(`v.fecha_v < ($${valores.length}::date + interval '1 day')`); }
+    const where = condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '';
+    const resultado = await pool.query(
+        `SELECT v.*, u.nombre_us, u.ap_us
+         FROM venta v LEFT JOIN usuarios u ON u.id_usuario = v.id_usuario_v
+         ${where} ORDER BY v.fecha_v DESC LIMIT 500`, valores
+    );
+    return resultado.rows;
+}
+
+export async function cancelarVentaRegistrada(id_venta, id_admin) {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const venta = await client.query('SELECT * FROM venta WHERE id_venta = $1 FOR UPDATE', [id_venta]);
+        if (!venta.rows.length) { await client.query('ROLLBACK'); return { error: 'NOT_FOUND' }; }
+        if (venta.rows[0].estado === 'CANCELADA') { await client.query('ROLLBACK'); return { error: 'CANCELADA' }; }
+        const detalles = await client.query('SELECT id_producto_dv, cantidad FROM detalle_venta WHERE id_venta_dv = $1', [id_venta]);
+        for (const item of detalles.rows) {
+            await client.query('UPDATE productos SET existencia = existencia + $1 WHERE id_producto = $2', [item.cantidad, item.id_producto_dv]);
+        }
+        const result = await client.query(
+            `UPDATE venta SET estado = 'CANCELADA', cancelada_por = $2, fecha_cancelacion = NOW()
+             WHERE id_venta = $1 RETURNING *`, [id_venta, id_admin]
+        );
+        await client.query('COMMIT');
+        return result.rows[0];
+    } catch (err) { await client.query('ROLLBACK'); throw err; }
+    finally { client.release(); }
+}

@@ -139,6 +139,7 @@ export class UsuariosComponent implements OnInit {
       direccion: '',
       telefono: '',
       usuario: '',
+      email: '',
       password: '',
       rol: null,
     };
@@ -152,6 +153,7 @@ export class UsuariosComponent implements OnInit {
     if (!this.REGEX_SOLO_LETRAS.test(u.am_us)) return 'El apellido materno solo puede contener letras';
     if (u.telefono && !this.REGEX_TELEFONO.test(u.telefono)) return 'El teléfono debe tener 10 dígitos numéricos';
     if (!this.REGEX_USUARIO.test(u.usuario) || u.usuario.length < 4) return 'El usuario debe tener al menos 4 caracteres (letras, números, guion bajo)';
+    if (!u.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u.email)) return 'Captura un correo válido';
     if (!this.modoEdicion && (!u.password || u.password.length < 8)) return 'La contraseña debe tener al menos 8 caracteres';
     return null;
   }

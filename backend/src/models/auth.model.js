@@ -1,15 +1,15 @@
 import pool from "../config/db.js";
 
-export async function crearUsuario({ nombre_us, ap_us, am_us, direccion, telefono, usuario, passwordHash, rol }) {
-    const sql = `INSERT INTO usuarios (nombre_us, ap_us, am_us, direccion, telefono, usuario, password, rol)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id_usuario`;
-    const resultado = await pool.query(sql, [nombre_us, ap_us, am_us, direccion, telefono, usuario, passwordHash, rol]);
+export async function crearUsuario({ nombre_us, ap_us, am_us, direccion, telefono, usuario, email, passwordHash, rol }) {
+    const sql = `INSERT INTO usuarios (nombre_us, ap_us, am_us, direccion, telefono, usuario, email, password, rol)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id_usuario, rol`;
+    const resultado = await pool.query(sql, [nombre_us, ap_us, am_us, direccion, telefono, usuario, email, passwordHash, rol]);
     return resultado.rows[0];
 }
 
 export async function buscarPorUsuario(usuario) {
     const resultado = await pool.query(
-        'SELECT id_usuario, nombre_us, ap_us, am_us, direccion, telefono, usuario, password, rol FROM usuarios WHERE usuario = $1',
+        'SELECT id_usuario, nombre_us, ap_us, am_us, direccion, telefono, usuario, email, password, rol FROM usuarios WHERE usuario = $1',
         [usuario]
     );
     return resultado.rows[0] || null;

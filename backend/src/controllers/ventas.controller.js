@@ -1,20 +1,20 @@
-import { registrarVenta, obtenerVenta, emitirTicket } from "../services/ventas.service.js";
+import { registrarVenta, obtenerVenta, obtenerVentas, emitirTicket, cancelarVenta } from "../services/ventas.service.js";
 
 export async function crear(req, res, next) {
     try {
         const {
-            id_cliente_v, id_usuario_v, tipo_venta,
-            numero_mesa, metodo_pago, propina, descuento, monto_recibido, items,
+            id_cliente_v, tipo_venta, numero_mesa, metodo_pago, propina,
+            descuento, monto_recibido, email_ticket, items,
         } = req.body;
 
-        if (!id_usuario_v || !metodo_pago || !Array.isArray(items) || !items.length) {
+        if (!['efectivo', 'tarjeta'].includes(metodo_pago) || !Array.isArray(items) || !items.length) {
             return res.status(400).json({
-                error: 'id_usuario_v, metodo_pago e items (con al menos 1 producto) son obligatorios',
+                error: 'El método de pago debe ser efectivo o tarjeta y debe haber productos',
             });
         }
 
         const resultado = await registrarVenta({
-            id_cliente_v, id_usuario_v, tipo_venta, numero_mesa,
+            id_cliente_v, id_usuario_v: req.usuario.id_usuario, tipo_venta, numero_mesa,
             metodo_pago, propina, descuento, monto_recibido, items,
         });
 
@@ -34,7 +34,17 @@ export async function crear(req, res, next) {
             });
         }
 
-        res.status(201).json(resultado.venta);
+        // Cada venta genera su PDF; cuando se proporciona Gmail también se envía.
+        let ticketEnviado = false;
+        let ticketError = null;
+        try {
+            await emitirTicket(resultado.venta.id_venta, email_ticket || null);
+            ticketEnviado = Boolean(email_ticket);
+        } catch (err) {
+            ticketError = 'La venta se registró, pero no se pudo enviar el ticket por correo';
+            console.error('Error de ticket:', err.message);
+        }
+        res.status(201).json({ ...resultado.venta, ticket_enviado: ticketEnviado, ticket_error: ticketError });
     } catch (err) {
         next(err);
     }
@@ -69,4 +79,19 @@ export async function ticket(req, res, next) {
     } catch (err) {
         next(err);
     }
+}
+
+export async function listar(req, res, next) {
+    try {
+        res.json(await obtenerVentas(req.query));
+    } catch (err) { next(err); }
+}
+
+export async function cancelar(req, res, next) {
+    try {
+        const resultado = await cancelarVenta(req.params.id, req.usuario);
+        if (resultado?.error === 'NOT_FOUND') return res.status(404).json({ error: 'Venta no encontrada' });
+        if (resultado?.error === 'CANCELADA') return res.status(409).json({ error: 'La venta ya está cancelada' });
+        res.json(resultado);
+    } catch (err) { next(err); }
 }

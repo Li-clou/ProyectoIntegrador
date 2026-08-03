@@ -1,4 +1,4 @@
-import { crearVenta, obtenerVentaCompleta } from "../models/ventas.model.js";
+import { crearVenta, obtenerVentaCompleta, listarVentas, cancelarVentaRegistrada } from "../models/ventas.model.js";
 import { revisarStockYNotificar } from "./productos.service.js";
 import { generarTicketPDF, enviarTicketPorCorreo } from "./ticket.service.js";
 
@@ -19,6 +19,9 @@ export async function registrarVenta(datos) {
 export async function obtenerVenta(id_venta) {
     return obtenerVentaCompleta(id_venta);
 }
+
+export async function obtenerVentas(filtros) { return listarVentas(filtros); }
+export async function cancelarVenta(id_venta, usuario) { return cancelarVentaRegistrada(id_venta, usuario.id_usuario); }
 
 // Se genera bajo demanda (botón "imprimir ticket"), nunca automático.
 // Si mandan email, además lo envía por correo con el PDF adjunto.

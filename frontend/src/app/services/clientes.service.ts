@@ -1,0 +1,3 @@
+import { Injectable } from '@angular/core'; import { HttpClient } from '@angular/common/http'; import { Observable } from 'rxjs';
+export interface Cliente{id_cliente?:number;nombre_cliente:string;rfc:string;domicilio:string;telefono:string;}
+@Injectable({providedIn:'root'}) export class ClientesService{constructor(private http:HttpClient){} listar(buscar=''):Observable<Cliente[]>{return this.http.get<Cliente[]>('/api/clientes',{params:{buscar},withCredentials:true});} crear(c:Cliente){return this.http.post<Cliente>('/api/clientes',c,{withCredentials:true});} actualizar(id:number,c:Cliente){return this.http.put<Cliente>(`/api/clientes/${id}`,c,{withCredentials:true});} eliminar(id:number){return this.http.delete(`/api/clientes/${id}`,{withCredentials:true});}}

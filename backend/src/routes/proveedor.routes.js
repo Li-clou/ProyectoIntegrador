@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { listar, obtener, crear, actualizar, eliminar } from "../controllers/proveedor.controller.js";
-import { verificarToken } from "../middlewares/auth.middleware.js";
+import { verificarToken, esAdmin } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -87,7 +87,7 @@ router.get('/:id', verificarToken, obtener);
  *       201: { description: Proveedor creado }
  *       400: { description: Falta nombre_pv }
  */
-router.post('/', verificarToken, crear);
+router.post('/', verificarToken, esAdmin, crear);
 
 /**
  * @swagger
@@ -110,7 +110,7 @@ router.post('/', verificarToken, crear);
  *       200: { description: Proveedor actualizado }
  *       404: { description: Proveedor no encontrado }
  */
-router.put('/:id', verificarToken, actualizar);
+router.put('/:id', verificarToken, esAdmin, actualizar);
 
 /**
  * @swagger
@@ -128,6 +128,6 @@ router.put('/:id', verificarToken, actualizar);
  *       404: { description: Proveedor no encontrado }
  *       409: { description: Hay productos usando este proveedor }
  */
-router.delete('/:id', verificarToken, eliminar);
+router.delete('/:id', verificarToken, esAdmin, eliminar);
 
 export default router;

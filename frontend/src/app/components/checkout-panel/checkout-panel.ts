@@ -29,7 +29,10 @@ export class CheckoutPanel {
     this.procesando = true;
     this.errorMsg = '';
 
-    this.ventasService.registrarVenta(this.cart.items(), this.metodoPago).subscribe({
+    this.ventasService.registrarVenta({
+      items: this.cart.items().map(i => ({ id_producto_dv: i.idProducto, cantidad: i.cantidad })),
+      metodo_pago: this.metodoPago === 'credito' ? 'tarjeta' : 'efectivo',
+    }).subscribe({
       next: () => {
         this.procesando = false;
         this.exito = true;

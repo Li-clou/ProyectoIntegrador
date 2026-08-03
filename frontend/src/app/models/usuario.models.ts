@@ -8,6 +8,7 @@ export interface Usuario {
   direccion?: string;
   telefono?: string;
   usuario: string;
+  email: string;
   password?: string; // solo se manda al crear
   rol: Rol;
 }

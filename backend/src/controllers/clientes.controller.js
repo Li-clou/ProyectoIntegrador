@@ -1,0 +1,6 @@
+import { listarClientes, obtenerCliente, crearCliente, actualizarCliente, eliminarCliente } from '../models/clientes.model.js';
+export async function listar(req,res,next){try{res.json(await listarClientes(req.query.buscar||''));}catch(e){next(e)}}
+export async function obtener(req,res,next){try{const x=await obtenerCliente(req.params.id);if(!x)return res.status(404).json({error:'Cliente no encontrado'});res.json(x);}catch(e){next(e)}}
+export async function crear(req,res,next){try{if(!req.body.nombre_cliente)return res.status(400).json({error:'El nombre es obligatorio'});res.status(201).json(await crearCliente(req.body));}catch(e){next(e)}}
+export async function actualizar(req,res,next){try{if(!req.body.nombre_cliente)return res.status(400).json({error:'El nombre es obligatorio'});const x=await actualizarCliente(req.params.id,req.body);if(!x)return res.status(404).json({error:'Cliente no encontrado'});res.json(x);}catch(e){next(e)}}
+export async function eliminar(req,res,next){try{const x=await eliminarCliente(req.params.id);if(!x)return res.status(404).json({error:'Cliente no encontrado'});res.json(x);}catch(e){if(e.code==='23503')return res.status(409).json({error:'El cliente tiene ventas registradas'});next(e)}}

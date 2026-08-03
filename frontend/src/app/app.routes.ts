@@ -1,15 +1,18 @@
 import { Routes } from '@angular/router';
 import { Login } from './auth/login/login';
-import { RegistroCliente } from './auth/register/register';
 import { Homescreen } from './pages/homescreen/homescreen';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard } from './guards/auth.guard';
 import { UsuariosComponent } from './pages/usuario/usuario';  
+import { InventarioComponent } from './pages/inventario/inventario';
+import { VentasComponent } from './pages/ventas/ventas';
+import { TurnosComponent } from './pages/turnos/turnos';
+import { ClientesComponent } from './pages/clientes/clientes';
+import { roleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'inicio-sesion', pathMatch: 'full' },
   { path: 'inicio-sesion', component: Login },
-  { path: 'registro', component: RegistroCliente },
 
   // Todo lo que va dentro de esta ruta comparte la misma sidebar.
   {
@@ -17,15 +20,16 @@ export const routes: Routes = [
     component: MainLayout,
     canActivate: [authGuard],
     children: [
-      { path: 'home', component: Homescreen }, // Pantalla principal para el Admin
+      { path: 'home', component: Homescreen, canActivate: [roleGuard], data: { roles: ['admin'] } },
 
       // Descomenta esta línea cuando crees tu componente de ventas para el Cajero
-      // { path: 'ventas', component: Ventas },
+      { path: 'ventas', component: VentasComponent },
 
-      // { path: 'inventario', component: Inventario },
-      // { path: 'clientes', component: Clientes },
+      { path: 'inventario', component: InventarioComponent, canActivate: [roleGuard], data: { roles: ['admin'] } },
+      { path: 'turnos', component: TurnosComponent },
+      { path: 'clientes', component: ClientesComponent },
 
-      { path: 'usuarios', component: UsuariosComponent }, // 👈 nuevo
+      { path: 'usuarios', component: UsuariosComponent, canActivate: [roleGuard], data: { roles: ['admin'] } },
     ],
   },
 

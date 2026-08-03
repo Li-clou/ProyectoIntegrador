@@ -2,7 +2,7 @@ import pool from "../config/db.js";
 
 export async function listarUsuarios() {
     const resultado = await pool.query(
-        `SELECT id_usuario, nombre_us, ap_us, am_us, direccion, telefono, usuario, rol
+        `SELECT id_usuario, nombre_us, ap_us, am_us, direccion, telefono, usuario, email, rol
          FROM usuarios ORDER BY nombre_us ASC`
     );
     return resultado.rows;
@@ -10,7 +10,7 @@ export async function listarUsuarios() {
 
 export async function obtenerUsuarioPorId(id_usuario) {
     const resultado = await pool.query(
-        `SELECT id_usuario, nombre_us, ap_us, am_us, direccion, telefono, usuario, rol
+        `SELECT id_usuario, nombre_us, ap_us, am_us, direccion, telefono, usuario, email, rol
          FROM usuarios WHERE id_usuario = $1`,
         [id_usuario]
     );
@@ -30,7 +30,7 @@ export async function actualizarUsuario(id_usuario, campos) {
     valores.push(id_usuario);
     const resultado = await pool.query(
         `UPDATE usuarios SET ${sets.join(', ')} WHERE id_usuario = $${valores.length}
-         RETURNING id_usuario, nombre_us, ap_us, am_us, direccion, telefono, usuario, rol`,
+         RETURNING id_usuario, nombre_us, ap_us, am_us, direccion, telefono, usuario, email, rol`,
         valores
     );
     return resultado.rows[0] || null;

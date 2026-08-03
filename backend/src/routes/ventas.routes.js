@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { crear, obtener, ticket } from "../controllers/ventas.controller.js";
-import { verificarToken } from "../middlewares/auth.middleware.js";
+import { crear, listar, obtener, ticket, cancelar } from "../controllers/ventas.controller.js";
+import { verificarToken, esAdmin } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -93,7 +93,9 @@ const router = Router();
  *       400: { description: Datos inválidos o stock insuficiente }
  *       404: { description: Algún producto no existe }
  */
+router.get('/', verificarToken, listar);
 router.post('/', verificarToken, crear);
+router.patch('/:id/cancelar', verificarToken, esAdmin, cancelar);
 
 /**
  * @swagger

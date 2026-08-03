@@ -27,8 +27,8 @@ export async function obtener(req, res, next) {
 //esto no se va a ocupar, ya que el registro de usuarios se hace desde el admin
 export async function crear(req, res, next) {
     try {
-        const { nombre_us, ap_us, am_us, usuario, password } = req.body;
-        if (!nombre_us || !ap_us || !am_us || !usuario || !password) {
+        const { nombre_us, ap_us, am_us, usuario, email, password } = req.body;
+        if (!nombre_us || !ap_us || !am_us || !usuario || !email || !password) {
             return res.status(400).json({
                 error: 'nombre_us, ap_us, am_us, usuario y password son obligatorios',
             });
@@ -47,7 +47,7 @@ export async function crear(req, res, next) {
 //aqui se hace la edicion de usuarios, solo el admin puede editar usuarios y aqui hacemos los cajeros y a los admins
 export async function actualizar(req, res, next) {
     try {
-        const camposPermitidos = ['nombre_us', 'ap_us', 'am_us', 'direccion', 'telefono', 'rol'];
+        const camposPermitidos = ['nombre_us', 'ap_us', 'am_us', 'direccion', 'telefono', 'email', 'rol'];
         const campos = {};
         for (const campo of camposPermitidos) {
             if (req.body[campo] !== undefined) campos[campo] = req.body[campo];

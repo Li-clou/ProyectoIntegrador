@@ -38,6 +38,8 @@ export async function crear(req, res, next) {
             });
         }
 
+        req.body.stock_minimo = Math.max(10, Number(req.body.stock_minimo || 10));
+        if (!req.body.id_proveedor) return res.status(400).json({ error: 'El proveedor es obligatorio' });
         const nuevoProducto = await registrarProducto(req.body);
         res.status(201).json(nuevoProducto);
     } catch (err) {

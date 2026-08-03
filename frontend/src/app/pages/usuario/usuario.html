@@ -229,6 +229,13 @@
           </div>
         </div>
 
+        <div>
+          <label class="block text-[#4A3B32] text-xs font-bold mb-1">Correo Gmail *</label>
+          <input type="email" [(ngModel)]="usuarioSeleccionado.email" name="email" required
+            class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl"
+            placeholder="cajero@gmail.com" />
+        </div>
+
         <!-- Password solo se pide al crear -->
         <div *ngIf="!modoEdicion">
           <label class="block text-[#4A3B32] text-xs font-bold mb-1">Contraseña *</label>

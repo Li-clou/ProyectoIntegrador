@@ -1,0 +1,2 @@
+import { Router } from 'express'; import { verificarToken } from '../middlewares/auth.middleware.js'; import { listar,obtener,crear,actualizar,eliminar } from '../controllers/clientes.controller.js';
+const router=Router(); router.use(verificarToken); router.get('/',listar); router.get('/:id',obtener); router.post('/',crear); router.put('/:id',actualizar); router.delete('/:id',eliminar); export default router;

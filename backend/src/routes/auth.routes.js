@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registro, login, logout, me, googleLogin } from "../controllers/auth.controller.js";
+import { login, logout, me } from "../controllers/auth.controller.js";
 import { verificarToken } from "../middlewares/auth.middleware.js";
 
 const router = Router();
@@ -115,7 +115,7 @@ const router = Router();
  *       409:
  *         description: El usuario ya esta registrado
  */
-router.post('/registro', registro);
+// El alta de usuarios se realiza exclusivamente desde /api/usuarios por un administrador.
 
 /**
  * @swagger
@@ -160,7 +160,6 @@ router.post('/login', login);
  *       401:
  *         description: Token invalido
  */
-router.post('/auth/google', googleLogin);
 
 /**
  * @swagger

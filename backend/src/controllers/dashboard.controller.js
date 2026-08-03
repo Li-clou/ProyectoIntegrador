@@ -5,14 +5,14 @@ export const getDashboardStats = async (req, res) => {
         // 1. Ventas del día (Suma del total de ventas con fecha de hoy)
         const ventasRes = await pool.query(`
             SELECT COALESCE(SUM(total), 0) AS total 
-            FROM venta WHERE DATE(fecha_v) = CURRENT_DATE
+            FROM venta WHERE DATE(fecha_v) = CURRENT_DATE AND COALESCE(estado, 'COMPLETADA') <> 'CANCELADA'
         `);
         const ventasDia = parseFloat(ventasRes.rows[0].total);
 
         // 2. Transacciones (Conteo de tickets de hoy)
         const transRes = await pool.query(`
             SELECT COUNT(id_venta) AS total 
-            FROM venta WHERE DATE(fecha_v) = CURRENT_DATE
+            FROM venta WHERE DATE(fecha_v) = CURRENT_DATE AND COALESCE(estado, 'COMPLETADA') <> 'CANCELADA'
         `);
         const transacciones = parseInt(transRes.rows[0].total);
 
@@ -28,7 +28,7 @@ export const getDashboardStats = async (req, res) => {
             SELECT COALESCE(SUM(dv.cantidad), 0) AS total 
             FROM detalle_venta dv 
             JOIN venta v ON dv.id_venta_dv = v.id_venta 
-            WHERE DATE(v.fecha_v) = CURRENT_DATE
+            WHERE DATE(v.fecha_v) = CURRENT_DATE AND COALESCE(v.estado, 'COMPLETADA') <> 'CANCELADA'
         `);
         const productosVendidos = parseInt(prodRes.rows[0].total);
 

@@ -45,11 +45,7 @@ export class Login {
             popup: 'rounded-3xl'
           }
         }).then(() => {
-          if (rolUsuario === 'admin') {
-            this.router.navigate(['/home']);
-          } else {
-            this.router.navigate(['/home']);
-          }
+          this.router.navigate([rolUsuario === 'admin' ? '/home' : '/ventas']);
         });
       },
       error: (err: any) => {

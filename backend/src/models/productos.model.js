@@ -5,9 +5,10 @@ export async function listarProductos({ buscar, id_marca } = {}) {
     const valores = [];
 
     let sql = `
-        SELECT p.*, m.nombre_marca
+        SELECT p.*, m.nombre_marca, pv.nombre_pv
         FROM productos p
         LEFT JOIN marcas m ON m.id_marca = p.id_marca_producto
+        LEFT JOIN proveedor pv ON pv.id_proveedor = p.id_proveedor
     `;
 
     if (buscar) {
@@ -29,9 +30,10 @@ export async function listarProductos({ buscar, id_marca } = {}) {
 
 export async function obtenerProductoPorId(id_producto) {
     const resultado = await pool.query(
-        `SELECT p.*, m.nombre_marca
+        `SELECT p.*, m.nombre_marca, pv.nombre_pv
          FROM productos p
          LEFT JOIN marcas m ON m.id_marca = p.id_marca_producto
+         LEFT JOIN proveedor pv ON pv.id_proveedor = p.id_proveedor
          WHERE p.id_producto = $1`,
         [id_producto]
     );
