@@ -29,7 +29,7 @@
       class="flex items-center justify-between py-3 border-b border-slate-50">
       <div class="min-w-0">
         <p class="text-[#20140C] font-semibold text-sm truncate">{{ item.nombre }}</p>
-        <p class="text-slate-400 text-xs capitalize">{{ item.tamano }} · x{{ item.cantidad }}</p>
+        <p class="text-slate-400 text-xs">x{{ item.cantidad }}</p>
       </div>
       <div class="flex items-center gap-3 shrink-0">
         <p class="text-[#6F4E37] font-bold text-sm">
@@ -58,7 +58,21 @@
 
     <div>
       <p class="text-slate-700 text-sm font-semibold mb-2">Método de pago</p>
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-3 gap-2">
+        <button type="button" (click)="seleccionarMetodo('efectivo')"
+          class="py-2.5 rounded-xl text-sm font-semibold border transition"
+          [ngClass]="metodoPago === 'efectivo'
+            ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
+            : 'bg-white text-slate-500 border-slate-200'">
+          Efectivo
+        </button>
+        <button type="button" (click)="seleccionarMetodo('tarjeta')"
+          class="py-2.5 rounded-xl text-sm font-semibold border transition"
+          [ngClass]="metodoPago === 'tarjeta'
+            ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
+            : 'bg-white text-slate-500 border-slate-200'">
+          Tarjeta
+        </button>
         <button type="button" (click)="seleccionarMetodo('credito')"
           class="py-2.5 rounded-xl text-sm font-semibold border transition"
           [ngClass]="metodoPago === 'credito'
@@ -66,14 +80,31 @@
             : 'bg-white text-slate-500 border-slate-200'">
           Crédito
         </button>
-        <button type="button" (click)="seleccionarMetodo('transferencia')"
-          class="py-2.5 rounded-xl text-sm font-semibold border transition"
-          [ngClass]="metodoPago === 'transferencia'
-            ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
-            : 'bg-white text-slate-500 border-slate-200'">
-          Transferencia
-        </button>
       </div>
+    </div>
+
+    <!-- Monto recibido: solo aparece si es efectivo -->
+    <div *ngIf="metodoPago === 'efectivo'">
+      <label class="text-slate-700 text-sm font-semibold mb-2 block">Monto recibido</label>
+      <input type="number" [(ngModel)]="montoRecibido" min="0" step="0.01"
+        placeholder="0.00"
+        class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#6F4E37]/30 focus:border-[#6F4E37] transition" />
+      <p *ngIf="montoRecibido !== null && cambio === null" class="text-red-500 text-xs mt-1">
+        El monto recibido es menor al total
+      </p>
+      <p *ngIf="cambio !== null" class="text-emerald-600 text-xs mt-1 font-semibold">
+        Cambio: ${{ cambio.toFixed(2) }}
+      </p>
+    </div>
+
+    <!-- Correo opcional para enviar el ticket -->
+    <div>
+      <label class="text-slate-700 text-sm font-semibold mb-2 block">
+        Correo para el ticket <span class="text-slate-400 font-normal">(opcional)</span>
+      </label>
+      <input type="email" [(ngModel)]="emailTicket"
+        placeholder="cliente@correo.com"
+        class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#6F4E37]/30 focus:border-[#6F4E37] transition" />
     </div>
 
     <div *ngIf="errorMsg" class="text-sm text-red-700 bg-red-100 border border-red-300 rounded-lg px-3 py-2">
@@ -81,10 +112,10 @@
     </div>
 
     <div *ngIf="exito" class="text-sm text-emerald-700 bg-emerald-100 border border-emerald-300 rounded-lg px-3 py-2">
-      Venta registrada correctamente
+      Venta registrada correctamente. Descargando ticket...
     </div>
 
-    <button type="button" (click)="confirmarVenta()" [disabled]="procesando || cart.items().length === 0"
+    <button type="button" (click)="confirmarVenta()" [disabled]="!puedeConfirmar"
       class="w-full bg-[#6F4E37] text-white font-semibold rounded-xl py-3 hover:bg-[#5a3f2c] transition disabled:opacity-50 disabled:cursor-not-allowed">
       {{ procesando ? 'Procesando...' : 'Confirmar venta' }}
     </button>

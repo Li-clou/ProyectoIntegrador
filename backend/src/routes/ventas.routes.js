@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { crear, listar, obtener, ticket, cancelar } from "../controllers/ventas.controller.js";
-import { verificarToken, esAdmin } from "../middlewares/auth.middleware.js";
+import { crear, listar, obtener, ticket } from "../controllers/ventas.controller.js";
+import { verificarToken } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -67,6 +67,40 @@ const router = Router();
  *           type: string
  *           example: cliente@correo.com
  *           description: Opcional. Si se manda, además envía el PDF por correo.
+ *     VentaResumen:
+ *       type: object
+ *       properties:
+ *         id_venta:
+ *           type: integer
+ *           example: 101
+ *         fecha_v:
+ *           type: string
+ *           format: date-time
+ *         subtotal:
+ *           type: number
+ *         iva_total:
+ *           type: number
+ *         propina:
+ *           type: number
+ *         descuento:
+ *           type: number
+ *         total:
+ *           type: number
+ *         metodo_pago:
+ *           type: string
+ *         tipo_venta:
+ *           type: string
+ *         numero_mesa:
+ *           type: integer
+ *           nullable: true
+ *         id_usuario_v:
+ *           type: integer
+ *         nombre_us:
+ *           type: string
+ *         ap_us:
+ *           type: string
+ *         total_articulos:
+ *           type: integer
  */
 
 /**
@@ -95,7 +129,37 @@ const router = Router();
  */
 router.get('/', verificarToken, listar);
 router.post('/', verificarToken, crear);
-router.patch('/:id/cancelar', verificarToken, esAdmin, cancelar);
+
+/**
+ * @swagger
+ * /ventas:
+ *   get:
+ *     summary: Lista ventas. Un admin ve todas (filtrable por cajero); un cajero solo ve las suyas.
+ *     tags: [Ventas]
+ *     parameters:
+ *       - in: query
+ *         name: fecha_inicio
+ *         schema: { type: string, format: date-time }
+ *         description: Filtra ventas desde esta fecha (inclusive)
+ *       - in: query
+ *         name: fecha_fin
+ *         schema: { type: string, format: date-time }
+ *         description: Filtra ventas hasta esta fecha (inclusive)
+ *       - in: query
+ *         name: id_usuario
+ *         schema: { type: integer }
+ *         description: Solo tiene efecto si el usuario logueado es admin; un cajero siempre ve solo las suyas
+ *     responses:
+ *       200:
+ *         description: Lista de ventas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/VentaResumen'
+ */
+router.get('/', verificarToken, listar);
 
 /**
  * @swagger
@@ -110,6 +174,7 @@ router.patch('/:id/cancelar', verificarToken, esAdmin, cancelar);
  *         schema: { type: integer }
  *     responses:
  *       200: { description: Venta encontrada }
+ *       403: { description: No tienes permiso para ver esta venta }
  *       404: { description: Venta no encontrada }
  */
 router.get('/:id', verificarToken, obtener);
@@ -136,6 +201,7 @@ router.get('/:id', verificarToken, obtener);
  *         content:
  *           application/pdf:
  *             schema: { type: string, format: binary }
+ *       403: { description: No tienes permiso para generar este ticket }
  *       404: { description: Venta no encontrada }
  */
 router.post('/:id/ticket', verificarToken, ticket);

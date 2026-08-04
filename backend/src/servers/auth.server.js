@@ -7,9 +7,8 @@ import swaggerUi from 'swagger-ui-express';
 import { PORT_AUTH } from '../config.js';
 import authRoutes from '../routes/auth.routes.js';
 import configRoutes from '../routes/config.routes.js';
-import dashboardRoutes from '../routes/dashboard.routes.js';
-import turnosRoutes from '../routes/turnos.routes.js';
-import clientesRoutes from '../routes/clientes.routes.js';
+import dashboardRoutes from '../routes/dashboard.routes.js'; // 👈 NUEVO
+import turnosRoutes from '../routes/turnos.routes.js';       // 👈 NUEVO
 
 const app = express();
 
@@ -24,19 +23,23 @@ const swaggerSpec = swaggerJsdoc({
         info: {
             title: "API de Autenticación",
             version: "1.0.0",
-            description: "Endpoints de registro, login y sesión",
+            description: "Endpoints de registro, login, sesión, dashboard y turnos",
         },
         servers: [{ url: `http://localhost:${PORT_AUTH}/api` }],
     },
-    apis: ["./src/routes/auth.routes.js", "./src/routes/config.routes.js"],
+    apis: [
+        "./src/routes/auth.routes.js",
+        "./src/routes/config.routes.js",
+        "./src/routes/dashboard.routes.js", // 👈 NUEVO
+        "./src/routes/turnos.routes.js",    // 👈 NUEVO
+    ],
 });
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api', authRoutes);
 app.use('/api', configRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/turnos', turnosRoutes);
-app.use('/api/clientes', clientesRoutes);
+app.use('/api/dashboard', dashboardRoutes); // 👈 NUEVO
+app.use('/api/turnos', turnosRoutes);       // 👈 NUEVO
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'auth' }));
 

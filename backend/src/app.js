@@ -13,7 +13,7 @@ import proveedorRoutes from './routes/proveedor.routes.js';
 import ventasRoutes from './routes/ventas.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
 import usuariosRoutes from './routes/usuarios.routes.js';
-
+import turnosRoutes from './routes/turnos.routes.js';
 const app = express();
 
 app.use(cors({
@@ -46,7 +46,8 @@ app.use('/api/marcas', marcasRoutes);
 app.use('/api/proveedor', proveedorRoutes);
 app.use('/api/ventas', ventasRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/usuarios', usuariosRoutes); // 👈
+app.use('/api/usuarios', usuariosRoutes); // 
+app.use('/api/turnos', turnosRoutes); //
 app.use('/api', authRoutes);
 app.use('/api', configRoutes);
 

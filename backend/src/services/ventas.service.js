@@ -1,4 +1,4 @@
-import { crearVenta, obtenerVentaCompleta, listarVentas, cancelarVentaRegistrada } from "../models/ventas.model.js";
+import { crearVenta, obtenerVentaCompleta, listarVentas } from "../models/ventas.model.js";
 import { revisarStockYNotificar } from "./productos.service.js";
 import { generarTicketPDF, enviarTicketPorCorreo } from "./ticket.service.js";
 
@@ -20,8 +20,12 @@ export async function obtenerVenta(id_venta) {
     return obtenerVentaCompleta(id_venta);
 }
 
-export async function obtenerVentas(filtros) { return listarVentas(filtros); }
-export async function cancelarVenta(id_venta, usuario) { return cancelarVentaRegistrada(id_venta, usuario.id_usuario); }
+// Para la pantalla de listado: admin ve todas, cajero solo las suyas
+// (el filtro por rol se aplica en el controller, aquí solo se pasa
+// lo que llegue en filtros).
+export async function obtenerListaVentas(filtros) {
+    return listarVentas(filtros);
+}
 
 // Se genera bajo demanda (botón "imprimir ticket"), nunca automático.
 // Si mandan email, además lo envía por correo con el PDF adjunto.

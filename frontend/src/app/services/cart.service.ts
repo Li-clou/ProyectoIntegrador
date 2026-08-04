@@ -1,10 +1,9 @@
-
 import { Injectable, signal, computed } from '@angular/core';
 
 export interface ItemCarrito {
   idProducto: number;
   nombre: string;
-  tamano: 'small' | 'large';
+  tamano: string; // antes 'small' | 'large'; el catálogo real no maneja tamaños
   precioUnitario: number;
   cantidad: number;
 }
@@ -38,13 +37,13 @@ export class CartService {
     }
   }
 
-  quitar(idProducto: number, tamano: 'small' | 'large'): void {
+  quitar(idProducto: number, tamano: string): void {
     this._items.update((lista) =>
       lista.filter((i) => !(i.idProducto === idProducto && i.tamano === tamano))
     );
   }
 
-  actualizarCantidad(idProducto: number, tamano: 'small' | 'large', cantidad: number): void {
+  actualizarCantidad(idProducto: number, tamano: string, cantidad: number): void {
     if (cantidad <= 0) {
       this.quitar(idProducto, tamano);
       return;

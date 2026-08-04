@@ -1,48 +1,8 @@
 {
-  "/api/productos": {
-    "target": "http://localhost:3001",
-    "secure": false,
-    "changeOrigin": true
-  },
-  "/api/marcas": {
-    "target": "http://localhost:3001",
-    "secure": false,
-    "changeOrigin": true
-  },
-  "/api/proveedor": {
-    "target": "http://localhost:3001",
-    "secure": false,
-    "changeOrigin": true
-  },
-  "/api/ventas": {
-    "target": "http://localhost:3002",
-    "secure": false,
-    "changeOrigin": true
-  },
-  "/api/usuarios": {
-    "target": "http://localhost:3003",
-    "secure": false,
-    "changeOrigin": true
-  },
-  "/api/turnos": {
-    "target": "http://localhost:3000",
-    "secure": false,
-    "changeOrigin": true
-  },
-  "/api/clientes": {
-    "target": "http://localhost:3000",
-    "secure": false,
-    "changeOrigin": true
-  },
-  "/api/dashboard": {
-    "target": "http://localhost:3000",
-    "secure": false,
-    "changeOrigin": true
-  },
-  "/api": {
-    "target": "http://localhost:3000",
-    "secure": false,
-    "changeOrigin": true,
-    "logLevel": "debug"
-  }
+  "/api/productos": { "target": "http://localhost:3001", "secure": false },
+  "/api/marcas": { "target": "http://localhost:3001", "secure": false },
+  "/api/proveedor": { "target": "http://localhost:3001", "secure": false },
+  "/api/ventas": { "target": "http://localhost:3002", "secure": false },
+  "/api/usuarios": { "target": "http://localhost:3003", "secure": false },
+  "/api": { "target": "http://localhost:3000", "secure": false }
 }

@@ -51,4 +51,43 @@ export const getDashboardStats = async (req, res) => {
         console.error('Error en getDashboardStats:', error);
         res.status(500).json({ error: 'Error interno al obtener estadísticas' });
     }
+
+    
+};
+
+export const getCajerosActivos = async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                t.id_turno,
+                u.id_usuario,
+                u.nombre_us,
+                u.ap_us,
+                t.fecha_inicio,
+                COALESCE(SUM(v.total), 0) AS monto_vendido,
+                COUNT(v.id_venta) AS transacciones
+            FROM turnos t
+            JOIN usuarios u ON u.id_usuario = t.id_usuario
+            LEFT JOIN venta v 
+                ON v.id_usuario_v = t.id_usuario 
+                AND v.fecha_v >= t.fecha_inicio
+            WHERE t.estado = 'ABIERTO'
+            GROUP BY t.id_turno, u.id_usuario, u.nombre_us, u.ap_us, t.fecha_inicio
+            ORDER BY t.fecha_inicio ASC
+        `);
+
+        const cajeros = result.rows.map(row => ({
+            id_usuario: row.id_usuario,
+            nombre_us: row.nombre_us,
+            ap_us: row.ap_us,
+            fecha_inicio: row.fecha_inicio,
+            montoVendido: parseFloat(row.monto_vendido),
+            transacciones: parseInt(row.transacciones)
+        }));
+
+        res.json(cajeros);
+    } catch (error) {
+        console.error('Error en getCajerosActivos:', error);
+        res.status(500).json({ error: 'Error interno al obtener cajeros activos' });
+    }
 };

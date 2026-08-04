@@ -1,0 +1,116 @@
+<div class="min-h-full w-full  p-6 lg:p-10">
+  <!-- Buscador -->
+  <div class="flex items-center gap-3 mt-4 mb-8">
+    <div class="relative flex-1">
+      <input type="text" [(ngModel)]="terminoBusqueda" (keyup.enter)="abrirFiltro()" (ngModelChange)="abrirFiltro()"
+        placeholder="Ej. Café caliente, Cappuccino..."
+        class="w-full bg-white border border-slate-200 rounded-xl pl-12 pr-4 py-4 text-sm text-slate-700 placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#6F4E37]/30 focus:border-[#6F4E37] transition" />
+
+      <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+          class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+      </div>
+    </div>
+    <button (click)="cargarProductos()"
+      class="bg-[#6F4E37] text-white rounded-xl px-6 py-4 text-sm font-semibold hover:bg-[#5a3f2c] transition shrink-0">
+      Actualizar
+    </button>
+  </div>
+
+  <!-- Título -->
+  <div class="mb-8">
+    <h1 class="text-[#000000] text-7xl font-extralight">Menu</h1>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMsg" class="mb-6 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+    {{ errorMsg }}
+  </div>
+
+  <!-- Cargando -->
+  <div *ngIf="cargando" class="flex justify-center py-16">
+    <svg class="animate-spin h-8 w-8 text-[#6F4E37]" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+  </div>
+
+  <!-- Sin resultados -->
+  <div *ngIf="!cargando && !errorMsg && productos.length === 0" class="text-center py-16 text-slate-400">
+    No se encontraron productos.
+  </div>
+
+  <!-- Grid de productos -->
+  <div *ngIf="!cargando" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12">
+    <div *ngFor="let producto of productos"
+      class="bg-white rounded-2xl p-5 shadow-md hover:shadow-xl transition-shadow duration-300 border border-black/5 flex flex-col">
+
+      <!-- Imagen -->
+      <div class="relative rounded-xl overflow-hidden mb-4 shadow-sm cursor-pointer"
+        (click)="preguntarCantidadYAgregar(producto)" title="Agregar al carrito">
+        <img [src]="producto.imagen" [alt]="producto.nombre"
+          class="w-full h-64 object-cover hover:scale-105 transition-transform duration-300" />
+        <span *ngIf="disponible(producto) <= 0"
+          class="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-full">
+          Sin stock
+        </span>
+      </div>
+
+      <!-- Nombre y precio -->
+      <div class="flex items-start justify-between mb-1">
+        <h3 class="text-[#20140C] font-bold text-xl">{{ producto.nombre }}</h3>
+        <p class="text-[#6F4E37] font-bold text-xl shrink-0 ml-2">${{ producto.precio.toFixed(2) }}</p>
+      </div>
+
+      <!-- Descripción -->
+      <p class="text-slate-400 text-sm mb-1 leading-relaxed">{{ producto.descripcion }}</p>
+
+      <!-- Stock disponible -->
+      <p class="text-xs font-semibold mb-4"
+        [ngClass]="disponible(producto) <= 3 && disponible(producto) > 0 ? 'text-amber-600' : disponible(producto) <= 0 ? 'text-red-500' : 'text-slate-400'">
+        {{ disponible(producto) > 0 ? disponible(producto) + ' disponibles' : 'Agotado' }}
+      </p>
+
+      <!-- Cantidad + Agregar al carrito -->
+      <div class="flex items-center gap-2 mt-auto">
+        <button type="button" (click)="disminuirCantidad(producto)"
+          class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition shrink-0">
+          −
+        </button>
+        <span class="w-6 text-center text-sm font-semibold text-slate-700">{{ producto.cantidad }}</span>
+        <button type="button" (click)="aumentarCantidad(producto)" [disabled]="producto.cantidad >= disponible(producto)"
+          class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
+          +
+        </button>
+
+        <button type="button" (click)="agregarAlCarrito(producto)" [disabled]="disponible(producto) <= 0"
+          class="flex-1 bg-[#6F4E37] text-white text-xs font-semibold rounded-lg py-3 hover:bg-[#5a3f2c] hover:shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed">
+          Add to Cart
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Botón flotante del carrito -->
+  <button type="button" (click)="panelAbierto.set(true)" [disabled]="cart.cantidadTotal() === 0"
+    class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#6F4E37] text-white rounded-full px-8 py-4 shadow-xl hover:bg-[#5a3f2c] transition flex items-center gap-3 z-40 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#6F4E37]">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+      class="w-5 h-5 shrink-0">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.723 2.436-7.235.083-.421-.244-.815-.673-.815H5.25M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+    </svg>
+    <span class="font-semibold text-sm">Realizar venta</span>
+    <span *ngIf="cart.cantidadTotal() > 0"
+      class="bg-white/20 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+      {{ cart.cantidadTotal() }}
+    </span>
+  </button>
+
+  <!-- Panel de checkout -->
+  <app-checkout-panel *ngIf="panelAbierto()" (cerrar)="onCerrarPanel()" />
+
+</div>

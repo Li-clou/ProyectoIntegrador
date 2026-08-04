@@ -1,32 +1,215 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import Swal from 'sweetalert2';
-import { InventarioService, Producto } from '../../services/inventario.service';
 import { VentasService } from '../../services/ventas.service';
-import { Cliente,ClientesService } from '../../services/clientes.service';
+import { UsuariosService } from '../../services/usuarios.service';
+import { AuthService } from '../../services/auth.services';
+import { VentaResumen } from '../../models/venta.model';
+import { Usuario } from '../../models/usuario.models';
 
-interface Linea { producto: Producto; cantidad: number; }
-@Component({ selector: 'app-ventas', standalone: true, imports: [CommonModule, FormsModule], templateUrl: './ventas.html' })
+type RangoFecha = 'hoy' | 'semana' | 'mes' | 'todos';
+type Rol = 'admin' | 'cajero' | 'pendiente';
+
+@Component({
+  selector: 'app-ventas',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './ventas.html',
+})
 export class VentasComponent implements OnInit {
-  productos: Producto[] = []; carrito: Linea[] = []; historial: any[] = []; buscar = '';
-  metodo: 'efectivo'|'tarjeta' = 'efectivo'; montoRecibido = 0; email = ''; error = ''; procesando = false;
-  clientes:Cliente[]=[]; idCliente:number|null=null;
-  constructor(private inventario: InventarioService, private ventas: VentasService,private clientesApi:ClientesService) {}
-  ngOnInit() { this.cargarProductos(); this.cargarHistorial(); this.clientesApi.listar().subscribe(x=>this.clientes=x); }
-  cargarProductos() { this.inventario.productos(this.buscar).subscribe(x => this.productos = x.filter(p => p.existencia > 0)); }
-  cargarHistorial() { this.ventas.listar().subscribe(x => this.historial = x); }
-  agregar(p: Producto) { const linea = this.carrito.find(x => x.producto.id_producto === p.id_producto); if (linea) { if (linea.cantidad < p.existencia) linea.cantidad++; } else this.carrito.push({ producto: p, cantidad: 1 }); }
-  quitar(i: number) { this.carrito.splice(i, 1); }
-  total() { return this.carrito.reduce((s, x) => s + Number(x.producto.precio_venta) * x.cantidad * (1 + Number(x.producto.iva || 0)/100), 0); }
-  confirmar() {
-    if (!this.carrito.length) return; if (this.metodo === 'efectivo' && this.montoRecibido < this.total()) { this.error = 'El efectivo recibido es insuficiente'; return; }
-    this.procesando = true; this.error = '';
-    this.ventas.registrarVenta({ items: this.carrito.map(x => ({ id_producto_dv: x.producto.id_producto!, cantidad: x.cantidad })), metodo_pago: this.metodo, monto_recibido: this.metodo === 'efectivo' ? this.montoRecibido : undefined, email_ticket: this.email || undefined, id_cliente_v:this.idCliente }).subscribe({
-      next: v => { this.procesando = false; this.carrito = []; this.montoRecibido = 0; this.email = ''; this.cargarProductos(); this.cargarHistorial(); Swal.fire('Venta registrada', `Folio #${v.id_venta}${v.ticket_enviado ? ' · Ticket enviado' : ''}`, 'success'); },
-      error: e => { this.procesando = false; this.error = e.error?.error || 'No se pudo registrar la venta'; }
+
+  ventas: VentaResumen[] = [];
+  cajeros: Usuario[] = [];
+
+  rol: Rol = 'cajero';
+
+  cargando = false;
+  errorMsg = '';
+
+  busqueda = '';
+  rango: RangoFecha = 'hoy';
+  filtroCajero: number | 'Todos' = 'Todos';
+
+  mostrarDetalle = false;
+  ventaDetalle: any = null;
+  cargandoDetalle = false;
+
+  constructor(
+    private ventasService: VentasService,
+    private usuariosService: UsuariosService,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.authService.me().subscribe({
+      next: (res: any) => {
+        this.rol = res?.usuario?.rol || 'cajero';
+        if (this.rol === 'admin') {
+          this.cargarCajeros();
+        }
+        this.cargarVentas();
+      },
+      error: () => {
+        this.rol = 'cajero';
+        this.cargarVentas();
+      }
     });
   }
-  abrirTicket(v: any) { this.ventas.ticket(v.id_venta).subscribe(pdf => window.open(URL.createObjectURL(pdf), '_blank')); }
-  cancelar(v: any) { Swal.fire({ title: `¿Cancelar venta #${v.id_venta}?`, text: 'El stock será devuelto', icon: 'warning', showCancelButton: true }).then(r => { if (r.isConfirmed) this.ventas.cancelar(v.id_venta).subscribe({ next: () => { this.cargarHistorial(); this.cargarProductos(); }, error: e => Swal.fire('Error', e.error?.error || '', 'error') }); }); }
+
+  get esAdmin(): boolean {
+    return this.rol === 'admin';
+  }
+
+  private rangoAFechas(): { fecha_inicio?: string } {
+    if (this.rango === 'todos') return {};
+
+    const inicio = new Date();
+
+    if (this.rango === 'hoy') {
+      inicio.setHours(0, 0, 0, 0);
+    } else if (this.rango === 'semana') {
+      const dia = inicio.getDay();
+      const diff = dia === 0 ? 6 : dia - 1; // lunes como inicio de semana
+      inicio.setDate(inicio.getDate() - diff);
+      inicio.setHours(0, 0, 0, 0);
+    } else if (this.rango === 'mes') {
+      inicio.setDate(1);
+      inicio.setHours(0, 0, 0, 0);
+    }
+
+    return { fecha_inicio: inicio.toISOString() };
+  }
+
+  cargarCajeros(): void {
+    this.usuariosService.listar().subscribe({
+      next: (data) => {
+        this.cajeros = data.filter(u => u.rol === 'cajero');
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+  }
+
+  cargarVentas(): void {
+    this.cargando = true;
+    this.errorMsg = '';
+
+    const filtros: any = this.rangoAFechas();
+    if (this.esAdmin && this.filtroCajero !== 'Todos') {
+      filtros.id_usuario = this.filtroCajero;
+    }
+
+    this.ventasService.listar(filtros).subscribe({
+      next: (data) => {
+        this.ventas = data;
+        this.cargando = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.errorMsg = err.error?.error || 'No se pudieron cargar las ventas';
+        this.cargando = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  cambiarRango(rango: RangoFecha): void {
+    this.rango = rango;
+    this.cargarVentas();
+  }
+
+  cambiarFiltroCajero(id: number | 'Todos'): void {
+    this.filtroCajero = id;
+    this.cargarVentas();
+  }
+
+  get ventasFiltradas(): VentaResumen[] {
+    const texto = this.busqueda.trim().toLowerCase();
+    if (!texto) return this.ventas;
+    return this.ventas.filter(v =>
+      String(v.id_venta).includes(texto) ||
+      `${v.nombre_us ?? ''} ${v.ap_us ?? ''}`.toLowerCase().includes(texto)
+    );
+  }
+
+  get totalVentas(): number {
+    return this.ventasFiltradas.reduce((acc, v) => acc + Number(v.total), 0);
+  }
+
+  get totalTransacciones(): number {
+    return this.ventasFiltradas.length;
+  }
+
+  get ticketPromedio(): number {
+    return this.totalTransacciones ? this.totalVentas / this.totalTransacciones : 0;
+  }
+
+  iniciales(v: VentaResumen): string {
+    return `${v.nombre_us?.charAt(0) ?? ''}${v.ap_us?.charAt(0) ?? ''}`.toUpperCase() || '—';
+  }
+
+  colorAvatar(v: VentaResumen): string {
+    const colores = ['bg-emerald-100 text-emerald-700', 'bg-sky-100 text-sky-700', 'bg-amber-100 text-amber-700', 'bg-violet-100 text-violet-700'];
+    const index = (v.id_usuario_v ?? 0) % colores.length;
+    return colores[index];
+  }
+
+  etiquetaMetodo(metodo: string): string {
+    const mapa: Record<string, string> = {
+      efectivo: 'Efectivo', tarjeta: 'Tarjeta', qr: 'QR', vales: 'Vales', credito: 'Crédito',
+    };
+    return mapa[metodo] || metodo;
+  }
+
+  colorMetodo(metodo: string): string {
+    const mapa: Record<string, string> = {
+      efectivo: 'bg-emerald-50 text-emerald-600',
+      tarjeta: 'bg-sky-50 text-sky-600',
+      qr: 'bg-violet-50 text-violet-600',
+      vales: 'bg-amber-50 text-amber-600',
+      credito: 'bg-rose-50 text-rose-600',
+    };
+    return mapa[metodo] || 'bg-stone-100 text-stone-500';
+  }
+
+  verDetalle(venta: VentaResumen): void {
+    this.mostrarDetalle = true;
+    this.cargandoDetalle = true;
+    this.ventaDetalle = null;
+
+    this.ventasService.obtener(venta.id_venta).subscribe({
+      next: (data) => {
+        this.ventaDetalle = data;
+        this.cargandoDetalle = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.cargandoDetalle = false;
+        this.errorMsg = err.error?.error || 'No se pudo cargar el detalle de la venta';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  cerrarDetalle(): void {
+    this.mostrarDetalle = false;
+    this.ventaDetalle = null;
+  }
+
+  descargarTicket(idVenta: number): void {
+    this.ventasService.obtenerTicket(idVenta).subscribe({
+      next: (pdfBlob: Blob) => {
+        const url = window.URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ticket-${idVenta}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => {
+        this.errorMsg = 'No se pudo generar el ticket';
+      }
+    });
+  }
 }

@@ -45,7 +45,11 @@ export class Login {
             popup: 'rounded-3xl'
           }
         }).then(() => {
-          this.router.navigate([rolUsuario === 'admin' ? '/home' : '/ventas']);
+          if (rolUsuario === 'admin') {
+            this.router.navigate(['/home']);
+          } else {
+            this.router.navigate(['/cajero-homescreen']);
+          }
         });
       },
       error: (err: any) => {

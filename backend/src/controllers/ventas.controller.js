@@ -1,15 +1,18 @@
-import { registrarVenta, obtenerVenta, obtenerVentas, emitirTicket, cancelarVenta } from "../services/ventas.service.js";
+import { registrarVenta, obtenerVenta, obtenerListaVentas, emitirTicket } from "../services/ventas.service.js";
 
 export async function crear(req, res, next) {
+    // ... (sin cambios, igual que ya lo tienes)
     try {
         const {
-            id_cliente_v, tipo_venta, numero_mesa, metodo_pago, propina,
-            descuento, monto_recibido, email_ticket, items,
+            id_cliente_v, tipo_venta,
+            numero_mesa, metodo_pago, propina, descuento, monto_recibido, items,
         } = req.body;
 
-        if (!['efectivo', 'tarjeta'].includes(metodo_pago) || !Array.isArray(items) || !items.length) {
+        const id_usuario_v = req.usuario.id_usuario;
+
+        if (!metodo_pago || !Array.isArray(items) || !items.length) {
             return res.status(400).json({
-                error: 'El método de pago debe ser efectivo o tarjeta y debe haber productos',
+                error: 'metodo_pago e items (con al menos 1 producto) son obligatorios',
             });
         }
 
@@ -34,17 +37,28 @@ export async function crear(req, res, next) {
             });
         }
 
-        // Cada venta genera su PDF; cuando se proporciona Gmail también se envía.
-        let ticketEnviado = false;
-        let ticketError = null;
-        try {
-            await emitirTicket(resultado.venta.id_venta, email_ticket || null);
-            ticketEnviado = Boolean(email_ticket);
-        } catch (err) {
-            ticketError = 'La venta se registró, pero no se pudo enviar el ticket por correo';
-            console.error('Error de ticket:', err.message);
+        res.status(201).json(resultado.venta);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// NUEVO: listado según rol
+export async function listar(req, res, next) {
+    try {
+        const { fecha_inicio, fecha_fin, id_usuario } = req.query;
+        const filtros = { fecha_inicio, fecha_fin };
+
+        if (req.usuario.rol === 'admin') {
+            // El admin puede filtrar por un cajero en particular si lo pide
+            if (id_usuario) filtros.id_usuario = id_usuario;
+        } else {
+            // Un cajero SIEMPRE ve solo lo suyo, sin importar qué mande en la query
+            filtros.id_usuario = req.usuario.id_usuario;
         }
-        res.status(201).json({ ...resultado.venta, ticket_enviado: ticketEnviado, ticket_error: ticketError });
+
+        const ventas = await obtenerListaVentas(filtros);
+        res.json(ventas);
     } catch (err) {
         next(err);
     }
@@ -56,22 +70,27 @@ export async function obtener(req, res, next) {
         if (!venta) {
             return res.status(404).json({ error: 'Venta no encontrada' });
         }
+        if (req.usuario.rol !== 'admin' && venta.id_usuario_v !== req.usuario.id_usuario) {
+            return res.status(403).json({ error: 'No tienes permiso para ver esta venta' });
+        }
         res.json(venta);
     } catch (err) {
         next(err);
     }
 }
 
-// Genera el ticket en PDF bajo demanda. Si el body trae "email",
-// también lo manda por correo. Siempre regresa el PDF en la respuesta.
 export async function ticket(req, res, next) {
     try {
-        const { email } = req.body;
-        const resultado = await emitirTicket(req.params.id, email);
-
-        if (resultado.error === 'NOT_FOUND') {
+        const venta = await obtenerVenta(req.params.id);
+        if (!venta) {
             return res.status(404).json({ error: 'Venta no encontrada' });
         }
+        if (req.usuario.rol !== 'admin' && venta.id_usuario_v !== req.usuario.id_usuario) {
+            return res.status(403).json({ error: 'No tienes permiso para generar este ticket' });
+        }
+
+        const { email } = req.body;
+        const resultado = await emitirTicket(req.params.id, email);
 
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `inline; filename="ticket-${req.params.id}.pdf"`);

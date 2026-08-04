@@ -1,28 +1,40 @@
-import { listarTurnos, abrirTurno, cerrarTurno, turnoAbiertoDeUsuario } from '../models/turnos.model.js';
+import { obtenerMiTurnoActivo, cerrarTurnoCajero, obtenerHistorial } from "../services/turnos.service.js";
 
-const TIPOS = ['matutino', 'vespertino', 'nocturno'];
-
-export async function listar(req, res, next) {
-    try { res.json(await listarTurnos(req.query)); } catch (err) { next(err); }
-}
-
-export async function actual(req, res, next) {
-    try { res.json(await turnoAbiertoDeUsuario(req.usuario.id_usuario)); } catch (err) { next(err); }
-}
-
-export async function abrir(req, res, next) {
+export async function miTurno(req, res) {
     try {
-        const id_usuario = req.usuario.rol === 'admin' && req.body.id_usuario ? req.body.id_usuario : req.usuario.id_usuario;
-        if (!TIPOS.includes(req.body.tipo_turno)) return res.status(400).json({ error: 'Turno inválido' });
-        if (await turnoAbiertoDeUsuario(id_usuario)) return res.status(409).json({ error: 'El cajero ya tiene un turno abierto' });
-        res.status(201).json(await abrirTurno({ id_usuario, tipo_turno: req.body.tipo_turno, monto_inicial: req.body.monto_inicial }));
-    } catch (err) { next(err); }
+        const turno = await obtenerMiTurnoActivo(req.usuario.id_usuario);
+        res.json(turno); // null si no tiene turno abierto
+    } catch (err) {
+        console.error('Error en miTurno:', err);
+        res.status(500).json({ error: 'Error al consultar el turno activo' });
+    }
 }
 
-export async function cerrar(req, res, next) {
+export async function cerrar(req, res) {
     try {
-        const turno = await cerrarTurno(req.params.id, Number(req.body.monto_final || 0));
-        if (!turno) return res.status(404).json({ error: 'Turno abierto no encontrado' });
-        res.json(turno);
-    } catch (err) { next(err); }
+        const { monto_final } = req.body;
+        if (monto_final === undefined || monto_final === null || isNaN(monto_final)) {
+            return res.status(400).json({ error: 'monto_final es obligatorio y debe ser numérico' });
+        }
+
+        const resultado = await cerrarTurnoCajero(req.usuario.id_usuario, monto_final);
+        if (resultado.error === 'SIN_TURNO_ABIERTO') {
+            return res.status(400).json({ error: 'No tienes un turno abierto para cerrar' });
+        }
+
+        res.json(resultado);
+    } catch (err) {
+        console.error('Error en cerrar turno:', err);
+        res.status(500).json({ error: 'Error al cerrar el turno' });
+    }
+}
+
+export async function historial(req, res) {
+    try {
+        const turnos = await obtenerHistorial(req.usuario.id_usuario);
+        res.json(turnos);
+    } catch (err) {
+        console.error('Error en historial:', err);
+        res.status(500).json({ error: 'Error al obtener el historial de turnos' });
+    }
 }

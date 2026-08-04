@@ -1,14 +1,12 @@
 import { Routes } from '@angular/router';
 import { Login } from './auth/login/login';
 import { Homescreen } from './pages/homescreen/homescreen';
+import { Homescreen as CajeroHomescreen } from './pages/cajero-homescreen/cajero-homescreen';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard } from './guards/auth.guard';
-import { UsuariosComponent } from './pages/usuario/usuario';  
+import { UsuariosComponent } from './pages/usuario/usuario';
 import { InventarioComponent } from './pages/inventario/inventario';
 import { VentasComponent } from './pages/ventas/ventas';
-import { TurnosComponent } from './pages/turnos/turnos';
-import { ClientesComponent } from './pages/clientes/clientes';
-import { roleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'inicio-sesion', pathMatch: 'full' },
@@ -20,18 +18,15 @@ export const routes: Routes = [
     component: MainLayout,
     canActivate: [authGuard],
     children: [
-      { path: 'home', component: Homescreen, canActivate: [roleGuard], data: { roles: ['admin'] } },
-
-      // Descomenta esta línea cuando crees tu componente de ventas para el Cajero
+      { path: 'home', component: Homescreen }, // Pantalla principal para el Admin
+      { path: 'cajero-homescreen', component: CajeroHomescreen }, // Pantalla principal para el Cajero
+      { path: 'inventario', component: InventarioComponent },
       { path: 'ventas', component: VentasComponent },
+      // { path: 'clientes', component: Clientes },
 
-      { path: 'inventario', component: InventarioComponent, canActivate: [roleGuard], data: { roles: ['admin'] } },
-      { path: 'turnos', component: TurnosComponent },
-      { path: 'clientes', component: ClientesComponent },
-
-      { path: 'usuarios', component: UsuariosComponent, canActivate: [roleGuard], data: { roles: ['admin'] } },
+      { path: 'usuarios', component: UsuariosComponent },
     ],
   },
 
   { path: '**', redirectTo: 'inicio-sesion' },
-];
+];  

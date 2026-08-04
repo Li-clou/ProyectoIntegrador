@@ -2,13 +2,13 @@
 <div *ngIf="abierta" (click)="cerrar.emit()" class="fixed inset-0 bg-black/40 z-30 lg:hidden"></div>
 
 <aside
-  class="fixed lg:static inset-y-0 left-0 z-40 w-72 h-screen lg:h-screen shrink-0 bg-[#4A3B32] flex flex-col transition-transform duration-200 ease-out lg:translate-x-0"
+  class="fixed lg:static inset-y-0 left-0 z-40 w-60 h-screen lg:h-screen shrink-0 bg-[#4A3B32] flex flex-col transition-transform duration-200 ease-out lg:translate-x-0"
   [class.-translate-x-full]="!abierta"
   [class.translate-x-0]="abierta">
 
   <!-- Marca -->
-  <div class="px-6 pt-8 pb-6 border-b border-white/10 shrink-0">
-    <p class="text-[#FDFBF7] font-bold text-6xl leading-none">Kunibo<span class="align-super text-xs">™</span></p>
+  <div class="px-5 pt-8 pb-6 border-b border-white/10 shrink-0">
+    <p class="text-[#FDFBF7] font-bold text-4xl leading-none">Kunibo<span class="align-super text-xs">™</span></p>
     <p class="text-[#FDFBF7]/50 text-xs mt-1">Punto de venta</p>
   </div>
 
@@ -25,16 +25,36 @@
     </a>
   </nav>
 
-  <!-- Cerrar sesión -->
-  <div class="px-3 pb-6 pt-3 border-t border-white/10 shrink-0">
+  <!-- Cerrar caja + Cerrar sesión -->
+  <div class="px-3 pb-6 pt-3 border-t border-white/10 shrink-0 flex flex-col gap-1">
+
+    <!-- Cerrar caja: solo para cajeros -->
+    <button *ngIf="rol === 'cajero'" type="button" (click)="onCerrarTurno()" [disabled]="cerrandoTurno"
+      class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#FDFBF7]/60 hover:bg-white/10 hover:text-[#FDFBF7] transition text-sm font-medium disabled:opacity-50">
+      <svg *ngIf="!cerrandoTurno" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-5 h-5 shrink-0">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5a1.5 1.5 0 00-1.5 1.5v3.75a1.5 1.5 0 001.5 1.5h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75zM12 12v3.75m-9 0h18" />
+      </svg>
+      <svg *ngIf="cerrandoTurno" class="animate-spin h-5 w-5 shrink-0 text-[#FDFBF7]/80" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      {{ cerrandoTurno ? 'Cerrando turno...' : 'Cerrar caja' }}
+    </button>
+
+    <!-- Cerrar sesión -->
     <button type="button" (click)="onCerrarSesion()" [disabled]="cerrandoSesion"
       class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#FDFBF7]/60 hover:bg-white/10 hover:text-[#FDFBF7] transition text-sm font-medium disabled:opacity-50">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      <svg *ngIf="!cerrandoSesion" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="1.5" class="w-5 h-5 shrink-0">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
       </svg>
+      <svg *ngIf="cerrandoSesion" class="animate-spin h-5 w-5 shrink-0 text-[#FDFBF7]/80" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
       {{ cerrandoSesion ? 'Cerrando sesión...' : 'Cerrar sesión' }}
     </button>
+
   </div>
 </aside>

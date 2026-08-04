@@ -1,23 +1,318 @@
-<section class="space-y-6">
-  <div><h1 class="text-3xl font-bold text-[#4A3B32]">Inventario</h1><p class="text-stone-500">Productos, existencias y proveedores. Stock mínimo: 10.</p></div>
-  <div *ngIf="error" class="p-3 rounded-xl bg-red-50 text-red-700">{{ error }}</div>
-  <div class="grid xl:grid-cols-3 gap-6">
-    <form (ngSubmit)="guardarProducto()" class="bg-white p-5 rounded-2xl border space-y-3">
-      <h2 class="font-bold">{{ editandoProducto ? 'Editar' : 'Nuevo' }} producto</h2>
-      <input name="codigo" [(ngModel)]="producto.codigo" placeholder="Código" class="w-full border rounded-lg p-2" required>
-      <input name="nombre" [(ngModel)]="producto.nombre_producto" placeholder="Nombre" class="w-full border rounded-lg p-2" required>
-      <div class="grid grid-cols-2 gap-2"><input name="compra" [(ngModel)]="producto.precio_compra" type="number" min="0" step=".01" placeholder="Precio compra" class="border rounded-lg p-2"><input name="venta" [(ngModel)]="producto.precio_venta" type="number" min=".01" step=".01" placeholder="Precio venta" class="border rounded-lg p-2"></div>
-      <div class="grid grid-cols-3 gap-2"><input name="existencia" [(ngModel)]="producto.existencia" type="number" min="0" placeholder="Existencia" class="border rounded-lg p-2"><input name="minimo" [(ngModel)]="producto.stock_minimo" type="number" min="10" placeholder="Mínimo" class="border rounded-lg p-2"><input name="iva" [(ngModel)]="producto.iva" type="number" min="0" placeholder="IVA %" class="border rounded-lg p-2"></div>
-      <select name="proveedor" [(ngModel)]="producto.id_proveedor" class="w-full border rounded-lg p-2" required><option [ngValue]="null">Selecciona proveedor</option><option *ngFor="let p of proveedores" [ngValue]="p.id_proveedor">{{p.nombre_pv}}</option></select>
-      <button class="w-full bg-[#4A3B32] text-white rounded-lg p-2">Guardar producto</button>
-    </form>
-    <div class="xl:col-span-2 bg-white p-5 rounded-2xl border overflow-auto">
-      <input [(ngModel)]="buscar" (ngModelChange)="cargar()" placeholder="Buscar por nombre o código" class="w-full border rounded-lg p-2 mb-4">
-      <table class="w-full text-sm"><thead><tr class="text-left border-b"><th>Producto</th><th>Proveedor</th><th>Venta</th><th>Existencia</th><th></th></tr></thead><tbody><tr *ngFor="let p of productos" class="border-b"><td class="py-3"><b>{{p.nombre_producto}}</b><br><small>{{p.codigo}}</small></td><td>{{p.nombre_pv || 'Sin asignar'}}</td><td>{{p.precio_venta | currency:'MXN'}}</td><td [class.text-red-600]="p.existencia <= p.stock_minimo">{{p.existencia}} / mín. {{p.stock_minimo}}</td><td class="whitespace-nowrap"><button (click)="editarProducto(p)" class="text-blue-700 mr-3">Editar</button><button (click)="borrarProducto(p)" class="text-red-700">Eliminar</button></td></tr></tbody></table>
+<div class="h-full w-full flex font-sans text-stone-800 overflow-hidden">
+  <div class="flex-1 flex flex-col overflow-hidden">
+
+    <header class="flex items-center justify-between px-8 py-6 shrink-0">
+      <div>
+        <h1 class="text-2xl font-bold text-[#2E211A]">Inventario</h1>
+        <p class="text-stone-500 text-sm mt-0.5">Gestiona tus productos, precios y existencias</p>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 pb-8">
+
+      <div *ngIf="errorMsg && !mostrarModal && !mostrarModalStock" class="mb-4 text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
+        {{ errorMsg }}
+      </div>
+
+      <!-- Tarjetas resumen -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-2xl p-5 shadow-[0_4px_16px_rgb(0,0,0,0.03)] flex items-center gap-4">
+          <div class="w-11 h-11 rounded-xl bg-[#F4F1EA] flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-[#8B5A33]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-stone-500 text-xs">Total productos</p>
+            <p class="text-2xl font-bold text-[#2E211A]">{{ totalProductos }}</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-[0_4px_16px_rgb(0,0,0,0.03)] flex items-center gap-4">
+          <div class="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-stone-500 text-xs">Stock bajo</p>
+            <p class="text-2xl font-bold text-[#2E211A]">{{ totalStockBajo }}</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-[0_4px_16px_rgb(0,0,0,0.03)] flex items-center gap-4">
+          <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182C10.55 7.72 11.275 7.5 12 7.5c.768 0 1.536.219 2.121.659l.879.659" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-stone-500 text-xs">Valor de inventario</p>
+            <p class="text-2xl font-bold text-[#2E211A]">{{ valorInventario | currency:'MXN' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="bg-white rounded-2xl shadow-[0_4px_16px_rgb(0,0,0,0.03)] overflow-hidden">
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-stone-100">
+          <div class="flex items-center gap-2 flex-wrap">
+            <button (click)="cambiarFiltroMarca('Todos')"
+              [ngClass]="filtroMarca === 'Todos' ? 'bg-[#4A3B32] text-white' : 'bg-stone-50 text-stone-500'"
+              class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+              Todas las marcas
+            </button>
+            <button *ngFor="let m of marcas" (click)="cambiarFiltroMarca(m.id_marca!)"
+              [ngClass]="filtroMarca === m.id_marca ? 'bg-[#4A3B32] text-white' : 'bg-stone-50 text-stone-500'"
+              class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+              {{ m.nombre_marca }}
+            </button>
+            <button (click)="toggleStockBajo()"
+              [ngClass]="soloStockBajo ? 'bg-red-600 text-white' : 'bg-stone-50 text-stone-500'"
+              class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+              Solo stock bajo
+            </button>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="relative">
+              <svg class="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+              <input type="text" [(ngModel)]="busqueda" (ngModelChange)="aplicarFiltros()"
+                placeholder="Buscar por nombre o código..."
+                class="pl-9 pr-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl w-full sm:w-56 focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32]" />
+            </div>
+            <button (click)="abrirModalNuevo()"
+              class="flex items-center gap-2 px-4 py-2 bg-[#4A3B32] hover:bg-[#382b24] text-white rounded-xl text-xs font-semibold transition-colors whitespace-nowrap">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Nuevo producto
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="border-b border-stone-100">
+                <th class="px-5 py-3 text-[11px] font-semibold text-stone-400 uppercase tracking-wide">Producto</th>
+                <th class="px-5 py-3 text-[11px] font-semibold text-stone-400 uppercase tracking-wide">Marca</th>
+                <th class="px-5 py-3 text-[11px] font-semibold text-stone-400 uppercase tracking-wide text-right">Precio venta</th>
+                <th class="px-5 py-3 text-[11px] font-semibold text-stone-400 uppercase tracking-wide text-right">Existencia</th>
+                <th class="px-5 py-3 text-[11px] font-semibold text-stone-400 uppercase tracking-wide text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="cargando">
+                <td colspan="5" class="px-5 py-10 text-center text-stone-400 text-sm">Cargando productos...</td>
+              </tr>
+
+              <tr *ngFor="let p of productosFiltrados" class="border-b border-stone-50 hover:bg-stone-50/60 transition-colors">
+                <td class="px-5 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-[#F4F1EA] flex items-center justify-center shrink-0 overflow-hidden">
+                      <img *ngIf="p.foto" [src]="p.foto" class="w-full h-full object-cover" />
+                      <svg *ngIf="!p.foto" class="w-4 h-4 text-[#8B5A33]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-[#2E211A]">{{ p.nombre_producto }}</p>
+                      <p class="text-xs text-stone-400">{{ p.codigo }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-3 text-sm text-stone-600">{{ p.nombre_marca || '—' }}</td>
+                <td class="px-5 py-3 text-sm text-stone-600 text-right">{{ p.precio_venta | currency:'MXN' }}</td>
+                <td class="px-5 py-3 text-right">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold"
+                    [ngClass]="esStockBajo(p) ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'">
+                    {{ p.existencia }}
+                  </span>
+                </td>
+                <td class="px-5 py-3">
+                  <div class="flex items-center justify-end gap-1">
+                    <button (click)="abrirAjusteStock(p, 'entrada')" title="Entrada de stock"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg text-stone-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      </svg>
+                    </button>
+                    <button (click)="abrirAjusteStock(p, 'salida')" title="Salida de stock"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
+                      </svg>
+                    </button>
+                    <button (click)="abrirModalEditar(p)"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg text-stone-400 hover:text-[#4A3B32] hover:bg-stone-100 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                      </svg>
+                    </button>
+                    <button (click)="confirmarEliminar(p)"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr *ngIf="!cargando && productosFiltrados.length === 0">
+                <td colspan="5" class="px-5 py-10 text-center text-stone-400 text-sm">
+                  No se encontraron productos con esos filtros
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: CREAR / EDITAR PRODUCTO -->
+  <div *ngIf="mostrarModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="w-full max-w-lg bg-white rounded-[2rem] p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-[#2E211A]">{{ modoEdicion ? 'Editar producto' : 'Nuevo producto' }}</h2>
+        <button (click)="cerrarModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-stone-100 text-stone-400 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div *ngIf="errorMsg" class="mb-4 text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
+        {{ errorMsg }}
+      </div>
+
+      <form (ngSubmit)="guardarProducto()" ngNativeValidate class="space-y-3">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[#4A3B32] text-xs font-bold mb-1">Código *</label>
+            <input type="text" [(ngModel)]="productoSeleccionado.codigo" name="codigo" required
+              class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32]" />
+          </div>
+          <div>
+            <label class="block text-[#4A3B32] text-xs font-bold mb-1">Nombre *</label>
+            <input type="text" [(ngModel)]="productoSeleccionado.nombre_producto" name="nombre_producto" required
+              class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32]" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[#4A3B32] text-xs font-bold mb-1">Marca</label>
+            <select [(ngModel)]="productoSeleccionado.id_marca_producto" name="id_marca_producto"
+              class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32]">
+              <option [ngValue]="null">Sin marca</option>
+              <option *ngFor="let m of marcas" [ngValue]="m.id_marca">{{ m.nombre_marca }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[#4A3B32] text-xs font-bold mb-1">Proveedor</label>
+            <select [(ngModel)]="productoSeleccionado.id_proveedor" name="id_proveedor"
+              class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32]">
+              <option [ngValue]="null">Sin proveedor</option>
+              <option *ngFor="let pv of proveedores" [ngValue]="pv.id_proveedor">{{ pv.nombre_pv }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[#4A3B32] text-xs font-bold mb-1">Precio de compra</label>
+            <input type="number" step="0.01" min="0" [(ngModel)]="productoSeleccionado.precio_compra" name="precio_compra"
+              class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32]" />
+          </div>
+          <div>
+            <label class="block text-[#4A3B32] text-xs font-bold mb-1">Precio de venta *</label>
+            <input type="number" step="0.01" min="0" [(ngModel)]="productoSeleccionado.precio_venta" name="precio_venta" required
+              class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32]" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-[#4A3B32] text-xs font-bold mb-1">Existencia</label>
+            <input type="number" min="0" [(ngModel)]="productoSeleccionado.existencia" name="existencia"
+              class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32]" />
+          </div>
+          <div>
+            <label class="block text-[#4A3B32] text-xs font-bold mb-1">Stock mínimo</label>
+            <input type="number" min="0" [(ngModel)]="productoSeleccionado.stock_minimo" name="stock_minimo"
+              class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32]" />
+          </div>
+          <div>
+            <label class="block text-[#4A3B32] text-xs font-bold mb-1">IVA (%)</label>
+            <input type="number" min="0" max="100" [(ngModel)]="productoSeleccionado.iva" name="iva"
+              class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32]" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[#4A3B32] text-xs font-bold mb-1">URL de foto</label>
+          <input type="text" [(ngModel)]="productoSeleccionado.foto" name="foto"
+            placeholder="https://..."
+            class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32]" />
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" (click)="cerrarModal()"
+            class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-stone-500 bg-stone-50 hover:bg-stone-100 transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="cargando"
+            class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#4A3B32] hover:bg-[#382b24] transition-colors disabled:opacity-70">
+            {{ modoEdicion ? 'Guardar cambios' : 'Crear producto' }}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
-  <div class="grid lg:grid-cols-3 gap-6">
-    <form (ngSubmit)="guardarProveedor()" class="bg-white p-5 rounded-2xl border space-y-3"><h2 class="font-bold">{{editandoProveedor?'Editar':'Nuevo'}} proveedor</h2><input name="pn" [(ngModel)]="proveedor.nombre_pv" placeholder="Nombre" class="w-full border rounded-lg p-2"><input name="pd" [(ngModel)]="proveedor.direccion_pv" placeholder="Dirección" class="w-full border rounded-lg p-2"><input name="pt" [(ngModel)]="proveedor.telefono_pv" placeholder="Teléfono" class="w-full border rounded-lg p-2"><button class="w-full bg-[#8B5A33] text-white rounded-lg p-2">Guardar proveedor</button></form>
-    <div class="lg:col-span-2 bg-white p-5 rounded-2xl border"><h2 class="font-bold mb-3">Proveedores</h2><div *ngFor="let p of proveedores" class="flex justify-between border-b py-3"><span><b>{{p.nombre_pv}}</b><br><small>{{p.telefono_pv}} · {{p.direccion_pv}}</small></span><span><button (click)="editarProveedor(p)" class="text-blue-700 mr-3">Editar</button><button (click)="borrarProveedor(p)" class="text-red-700">Eliminar</button></span></div></div>
+
+  <!-- MODAL: AJUSTE DE STOCK -->
+  <div *ngIf="mostrarModalStock" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="w-full max-w-sm bg-white rounded-[2rem] p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-[#2E211A]">
+          {{ tipoAjuste === 'entrada' ? 'Entrada de stock' : 'Salida de stock' }}
+        </h2>
+        <button (click)="cerrarAjusteStock()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-stone-100 text-stone-400 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <p class="text-sm text-stone-500 mb-4">{{ productoAjuste?.nombre_producto }}</p>
+
+      <div *ngIf="errorMsg" class="mb-3 text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
+        {{ errorMsg }}
+      </div>
+
+      <label class="block text-[#4A3B32] text-xs font-bold mb-1">Cantidad</label>
+      <input type="number" min="1" [(ngModel)]="cantidadAjuste"
+        class="w-full px-3 py-2 bg-[#FDFBF7] border border-stone-200 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A3B32]/20 focus:border-[#4A3B32] mb-4" />
+
+      <div class="flex gap-3">
+        <button type="button" (click)="cerrarAjusteStock()"
+          class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-stone-500 bg-stone-50 hover:bg-stone-100 transition-colors">
+          Cancelar
+        </button>
+        <button type="button" (click)="confirmarAjusteStock()"
+          class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#4A3B32] hover:bg-[#382b24] transition-colors">
+          Confirmar
+        </button>
+      </div>
+    </div>
   </div>
-</section>
+
+</div>

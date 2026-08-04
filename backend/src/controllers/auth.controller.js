@@ -1,15 +1,56 @@
-import { loginUsuario } from '../services/auth.service.js';
-import { buscarPorUsuario } from '../models/auth.model.js';
+import { registrarUsuario, loginUsuario, loginConGoogle } from "../services/auth.service.js";
+import { buscarPorUsuario } from "../models/auth.model.js";
+import { buscarTurnoAbierto, crearTurno } from "../models/turnos.model.js";
+
+export async function registro(req, res) {
+    try {
+        const { nombre_us, ap_us, am_us, direccion, telefono, usuario, password } = req.body;
+        if (!nombre_us || !ap_us || !am_us || !usuario || !password) {
+            return res.status(400).json({ error: 'nombre_us, ap_us, am_us, usuario y password son obligatorios' });
+        }
+
+        const nuevoUsuario = await registrarUsuario({ nombre_us, ap_us, am_us, direccion, telefono, usuario, password });
+        return res.status(201).json(nuevoUsuario);
+    } catch (err) {
+        if (err.code === '23505') { // código de duplicado en Postgres (usuario ya existe)
+            return res.status(409).json({ error: 'El usuario ya está registrado' });
+        }
+        console.error('Error en registro:', err);
+        return res.status(500).json({ error: 'Ocurrió un error en el servidor al intentar registrar.' });
+    }
+}
 
 export async function login(req, res) {
     try {
         const { usuario, password } = req.body;
         if (!usuario || !password) return res.status(400).json({ error: 'Usuario y contraseña son obligatorios' });
         const resultado = await loginUsuario({ usuario, password });
-        if (!resultado) return res.status(401).json({ error: 'Credenciales inválidas' });
-        if (!['admin', 'cajero'].includes(resultado.usuario.rol)) {
-            return res.status(403).json({ error: 'La cuenta no tiene acceso al sistema' });
+
+        if (!resultado) {
+            return res.status(401).json({ error: 'Credenciales inválidas. Verifica tu usuario y contraseña.' });
         }
+
+        // ==========================================
+        // 2. LÓGICA DE TURNOS (SOLO PARA CAJEROS)
+        // ==========================================
+        const user = resultado.usuario; // Extraemos la info del usuario devuelta por tu servicio
+        if (!user.rol) {
+            return res.status(500).json({ error: 'El usuario no tiene un rol asignado. Contacta al administrador.' });
+        }
+
+        if (user.rol === 'cajero') {
+            const turnoAbierto = await buscarTurnoAbierto(user.id_usuario);
+
+            if (!turnoAbierto) {
+                await crearTurno(user.id_usuario);
+                console.log(`Nuevo turno abierto para el cajero: ${user.usuario}`);
+            } else {
+                console.log(`El cajero ${user.usuario} retomó su turno abierto.`);
+            }
+        }
+        // ==========================================
+
+        // 3. Generamos la cookie con el token
         res.cookie('token', resultado.token, {
             httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 8 * 60 * 60 * 1000,
         });

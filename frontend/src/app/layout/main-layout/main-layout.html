@@ -3,7 +3,7 @@
   <!-- ===============================
        BARRA LATERAL (componente reutilizable, con routing real)
        =============================== -->
-  <app-sidebar [abierta]="sidebarAbierta()" (cerrar)="cerrarSidebar()"></app-sidebar>
+  <app-sidebar [abierta]="sidebarAbierta()" [rol]="rolUsuario()" (cerrar)="cerrarSidebar()"></app-sidebar>
 
   <!-- ===============================
        ÁREA PRINCIPAL (CONTENEDOR)
@@ -19,7 +19,7 @@
           </svg>
         </button>
         <div>
-          <h1 class="text-2xl font-bold text-[#4A3B32]">¡Buenos días, Administrador!</h1>
+          <h1 class="text-2xl font-bold text-[#4A3B32]">¡Buenos días, {{ nombreUsuario() }}!</h1>
           <p class="text-sm text-stone-500 mt-1">Turno Matutino &bull; 07:00 AM - 03:00 PM</p>
         </div>
       </div>
@@ -28,9 +28,6 @@
         <button class="relative p-2 text-stone-400 hover:text-stone-600 transition-colors bg-white rounded-full shadow-sm">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
           <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-[#8B5A33] rounded-full border-2 border-white"></span>
-        </button>
-        <button (click)="cerrarSesion()" class="px-5 py-2.5 border border-stone-200 text-stone-600 font-medium text-sm rounded-xl hover:bg-stone-50 transition-colors bg-white shadow-sm">
-          Cerrar sesión
         </button>
       </div>
     </header>

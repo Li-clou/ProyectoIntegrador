@@ -1,2 +1,34 @@
-import { Injectable } from '@angular/core'; import { HttpClient } from '@angular/common/http';
-@Injectable({ providedIn: 'root' }) export class TurnosService { constructor(private http:HttpClient){} listar(){return this.http.get<any[]>('/api/turnos',{withCredentials:true});} actual(){return this.http.get<any>('/api/turnos/actual',{withCredentials:true});} abrir(tipo_turno:string,monto_inicial:number){return this.http.post<any>('/api/turnos',{tipo_turno,monto_inicial},{withCredentials:true});} cerrar(id:number,monto_final:number){return this.http.patch<any>(`/api/turnos/${id}/cerrar`,{monto_final},{withCredentials:true});} }
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface TurnoActivo {
+  id_turno: number;
+  id_usuario: number;
+  fecha_inicio: string;
+  monto_inicial: number;
+  estado: string;
+  totalVendido: number;
+  transacciones: number;
+}
+
+export interface ResultadoCierre {
+  turno: any;
+  totalVendido: number;
+  transacciones: number;
+}
+
+@Injectable({ providedIn: 'root' })
+export class TurnosService {
+  private readonly baseUrl = '/api/turnos';
+
+  constructor(private http: HttpClient) {}
+
+  miTurno(): Observable<TurnoActivo | null> {
+    return this.http.get<TurnoActivo | null>(`${this.baseUrl}/mi-turno`, { withCredentials: true });
+  }
+
+  cerrarTurno(montoFinal: number): Observable<ResultadoCierre> {
+    return this.http.post<ResultadoCierre>(`${this.baseUrl}/cerrar`, { monto_final: montoFinal }, { withCredentials: true });
+  }
+}
