@@ -18,6 +18,8 @@ export interface FiltrosVentas {
 
 @Injectable({ providedIn: 'root' })
 export class VentasService {
+    private readonly baseUrl = '/api/ventas';   // 👈 esto faltaba
+
   constructor(private http: HttpClient) {}
 
   listar(filtros?: FiltrosVentas): Observable<VentaResumen[]> {

@@ -99,13 +99,6 @@ export async function ticket(req, res, next) {
         next(err);
     }
 }
-
-export async function listar(req, res, next) {
-    try {
-        res.json(await obtenerVentas(req.query));
-    } catch (err) { next(err); }
-}
-
 export async function cancelar(req, res, next) {
     try {
         const resultado = await cancelarVenta(req.params.id, req.usuario);
