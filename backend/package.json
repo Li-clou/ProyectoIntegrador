@@ -10,7 +10,11 @@
     "start:inventario": "nodemon src/servers/inventario.server.js",
     "start:ventas": "nodemon src/servers/ventas.server.js",
     "start:usuarios": "nodemon src/servers/usuarios.server.js",
-    "dev": "concurrently \"npm:start:auth\" \"npm:start:inventario\" \"npm:start:ventas\" \"npm:start:usuarios\""
+    "dev": "concurrently \"npm:start:auth\" \"npm:start:inventario\" \"npm:start:ventas\" \"npm:start:usuarios\"",
+    "prod:auth": "node src/servers/auth.server.js",
+    "prod:inventario": "node src/servers/inventario.server.js",
+    "prod:ventas": "node src/servers/ventas.server.js",
+    "prod:usuarios": "node src/servers/usuarios.server.js"
   },
   "keywords": [],
   "author": "",
