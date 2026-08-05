@@ -9,7 +9,7 @@ import ventasRoutes from '../routes/ventas.routes.js';
 
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:4200', credentials: true }));
+app.use(cors({ origin:  process.env.FRONTEND_URL || 'http://localhost:4200', credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -33,6 +33,6 @@ app.use('/api/ventas', ventasRoutes);
 app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'ventas' }));
 
 app.listen(PORT_VENTAS, () => {
-    console.log(`Ventas service corriendo en http://localhost:${PORT_VENTAS}`);
-    console.log(`Docs en http://localhost:${PORT_VENTAS}/api-docs`);
+    console.log(`Ventas service corriendo en el puerto :${PORT_VENTAS}`);
+    console.log(`Docs en :${PORT_VENTAS}/api-docs`);
 });

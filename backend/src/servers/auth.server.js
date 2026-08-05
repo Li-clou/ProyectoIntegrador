@@ -12,7 +12,7 @@ import turnosRoutes from '../routes/turnos.routes.js';       // 👈 NUEVO
 
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:4200', credentials: true }));
+app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:4200', credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -44,6 +44,6 @@ app.use('/api/turnos', turnosRoutes);       // 👈 NUEVO
 app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'auth' }));
 
 app.listen(PORT_AUTH, () => {
-    console.log(`Auth service corriendo en http://localhost:${PORT_AUTH}`);
-    console.log(`Docs en http://localhost:${PORT_AUTH}/api-docs`);
+    console.log(`Auth service corriendo en el puerto :${PORT_AUTH}`);
+    console.log(`Docs en :${PORT_AUTH}/api-docs`);
 });

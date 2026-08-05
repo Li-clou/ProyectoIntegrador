@@ -10,7 +10,7 @@ import configRoutes from '../routes/config.routes.js';
 
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:4200', credentials: true }));
+app.use(cors({ origin: process.env.FRONTEND_URL ||  'http://localhost:4200', credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -35,6 +35,6 @@ app.use('/api', configRoutes);
 app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'usuarios' }));
 
 app.listen(PORTH_USUARIOS, () => {
-    console.log(`Usuarios service corriendo en http://localhost:${PORTH_USUARIOS}`);
-    console.log(`Docs en http://localhost:${PORTH_USUARIOS}/api-docs`);
+    console.log(`Usuarios service corriendo en el puerto :${PORTH_USUARIOS}`);
+    console.log(`Docs en :${PORTH_USUARIOS}/api-docs`);
 });
