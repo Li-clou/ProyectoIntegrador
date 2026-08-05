@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/enviroments';
 
 export interface RegistroPayload {
   nombre_us: string;
@@ -21,7 +22,9 @@ export interface LoginPayload {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   // Ruta relativa: el proxy de Angular la reenvia a http://localhost:3000/api
-  private readonly baseUrl = '/api';
+
+  // Ruta absoluta: se usa en producción, apuntando al backend real
+  private readonly baseUrl = environment.authApi;
 
   constructor(private http: HttpClient) {}
 

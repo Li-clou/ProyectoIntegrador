@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ItemCarrito } from './cart.service';
 import { VentaResumen } from '../models/venta.model';
-
+import { environment } from '../../environments/enviroments';
 export interface PayloadVenta {
   items: { id_producto_dv: number; cantidad: number }[];
   metodo_pago: string;
@@ -18,7 +18,7 @@ export interface FiltrosVentas {
 
 @Injectable({ providedIn: 'root' })
 export class VentasService {
-    private readonly baseUrl = '/api/ventas';   // 👈 esto faltaba
+    private readonly baseUrl = environment.ventasApi + '/ventas';
 
   constructor(private http: HttpClient) {}
 

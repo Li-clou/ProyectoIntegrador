@@ -3,7 +3,7 @@ import { Injectable, signal, computed } from '@angular/core';
 export interface ItemCarrito {
   idProducto: number;
   nombre: string;
-  tamano: string; // antes 'small' | 'large'; el catálogo real no maneja tamaños
+  tamano?: string; 
   precioUnitario: number;
   cantidad: number;
 }
