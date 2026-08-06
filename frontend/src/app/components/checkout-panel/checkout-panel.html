@@ -35,7 +35,7 @@
         <p class="text-[#6F4E37] font-bold text-sm">
           ${{ (item.precioUnitario * item.cantidad).toFixed(2) }}
         </p>
-        <button type="button" (click)="cart.quitar(item.idProducto, item.tamano)"
+        <button type="button" (click)="cart.quitar(item.idProducto, item.tamano ?? 'unico')"
           class="text-slate-300 hover:text-red-500 transition">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
             stroke-width="1.5" class="w-4 h-4">
@@ -112,7 +112,7 @@
     </div>
 
     <div *ngIf="exito" class="text-sm text-emerald-700 bg-emerald-100 border border-emerald-300 rounded-lg px-3 py-2">
-      Venta registrada correctamente. Descargando ticket...
+      Venta registrada correctamente. Descargando tic ket...
     </div>
 
     <button type="button" (click)="confirmarVenta()" [disabled]="!puedeConfirmar"
