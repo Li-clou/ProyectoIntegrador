@@ -3,7 +3,7 @@ import { Injectable, signal, computed } from '@angular/core';
 export interface ItemCarrito {
   idProducto: number;
   nombre: string;
-  tamano?: string; 
+  tamano: string; // <-- CORREGIDO: Ya no es opcional (eliminé el '?')
   precioUnitario: number;
   cantidad: number;
 }
