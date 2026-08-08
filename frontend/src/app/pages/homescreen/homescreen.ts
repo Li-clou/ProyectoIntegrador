@@ -4,30 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import Swal from 'sweetalert2';
-import { CartService } from '../../services/cart.service';
-import { CheckoutPanel } from '../../components/checkout-panel/checkout-panel';
 import { AuthService } from '../../services/auth.services';
 import { CajerosModal } from '../../components/cajeros-modal/cajeros-modal';
-
-interface Producto {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  precioSmall: number;
-  precioLarge: number;
-  imagen: string;
-  tamanoSeleccionado: 'small' | 'large';
-  cantidad: number;
-}
-
-interface CajeroActivo {
-  id_usuario: number;
-  nombre_us: string;
-  ap_us: string;
-  fecha_inicio: string;
-  montoVendido: number;
-  transacciones: number;
-}
 
 @Component({
   selector: 'app-homescreen',
@@ -37,134 +15,22 @@ interface CajeroActivo {
   styleUrl: './homescreen.css',
 })
 export class Homescreen implements OnInit {
-  terminoBusqueda = '';
-  panelAbierto = signal(false);
-
-  // Controla si el modal flotante de "Gestionar cajeros" está abierto
   mostrarCajeros = signal(false);
-
-  // --- VARIABLES DEL HEADER Y DASHBOARD ---
   usuarioActual: string = 'Cargando...';
   fechaActual: Date = new Date();
 
-  // Objeto para almacenar las estadísticas reales que vienen de PostgreSQL
-  stats: any = {
-    ventasDia: 0,
-    transacciones: 0,
-    cajerosActivos: 0,
-    productosVendidos: 0,
-    inventarioBajo: 0
-  };
+  // Variables para almacenar los datos reales
+  stats: any = { ventasDia: 0, transacciones: 0, cajerosActivos: 0, productosVendidos: 0, inventarioBajo: 0 };
+  cajerosActivos: any[] = [];
+  inventarioBajoLista: any[] = [];
+  turnosRecientes: any[] = [];
+  ventasRecientes: any[] = []; // Para la bitácora
 
-  // Cajeros con turno abierto ahora mismo, con sus ventas del turno
-  cajerosActivos: CajeroActivo[] = [];
-
-  // --- CATÁLOGO DE PRODUCTOS ---
-  productos: Producto[] = [
-    {
-      id: 1,
-      nombre: 'Cappuccino',
-      descripcion: 'Espuma de leche cremosa con un shot de espresso intenso.',
-      precioSmall: 1.5,
-      precioLarge: 2.0,
-      imagen: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400',
-      tamanoSeleccionado: 'small',
-      cantidad: 1,
-    },
-    {
-      id: 2,
-      nombre: 'Coffee Latte',
-      descripcion: 'Espresso suave con leche vaporizada y un toque de dulzura.',
-      precioSmall: 1.6,
-      precioLarge: 2.1,
-      imagen: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400',
-      tamanoSeleccionado: 'small',
-      cantidad: 1,
-    },
-    {
-      id: 3,
-      nombre: 'Americano',
-      descripcion: 'Espresso diluido con agua caliente, sabor intenso y limpio.',
-      precioSmall: 1.55,
-      precioLarge: 2.05,
-      imagen: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=400',
-      tamanoSeleccionado: 'small',
-      cantidad: 1,
-    },
-    {
-      id: 4,
-      nombre: 'Espresso',
-      descripcion: 'Shot puro y concentrado, la base de todo buen café.',
-      precioSmall: 1.2,
-      precioLarge: 1.6,
-      imagen: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=400',
-      tamanoSeleccionado: 'small',
-      cantidad: 1,
-    },
-    {
-      id: 5,
-      nombre: 'Mocha',
-      descripcion: 'Espresso con chocolate y leche vaporizada, dulce y cremoso.',
-      precioSmall: 1.7,
-      precioLarge: 2.2,
-      imagen: 'https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?w=400',
-      tamanoSeleccionado: 'small',
-      cantidad: 1,
-    },
-    {
-      id: 6,
-      nombre: 'Macchiato',
-      descripcion: 'Espresso marcado con una pequeña capa de espuma de leche.',
-      precioSmall: 1.65,
-      precioLarge: 2.15,
-      imagen: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=400',
-      tamanoSeleccionado: 'small',
-      cantidad: 1,
-    },
-    {
-      id: 7,
-      nombre: 'Cold Brew',
-      descripcion: 'Café de extracción fría, suave y con menos acidez.',
-      precioSmall: 1.8,
-      precioLarge: 2.3,
-      imagen: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400',
-      tamanoSeleccionado: 'small',
-      cantidad: 1,
-    },
-    {
-      id: 8,
-      nombre: 'Flat White',
-      descripcion: 'Espresso doble con leche vaporizada en textura sedosa.',
-      precioSmall: 1.75,
-      precioLarge: 2.25,
-      imagen: 'https://images.unsplash.com/photo-1519082274554-2c14bc5e10ee?w=400',
-      tamanoSeleccionado: 'small',
-      cantidad: 1,
-    },
-    {
-      id: 9,
-      nombre: 'Caramel Latte',
-      descripcion: 'Latte clásico con un toque de caramelo dulce y suave.',
-      precioSmall: 1.85,
-      precioLarge: 2.35,
-      imagen: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400',
-      tamanoSeleccionado: 'small',
-      cantidad: 1,
-    },
-    {
-      id: 10,
-      nombre: 'Frappé',
-      descripcion: 'Café helado batido, refrescante y con mucha espuma.',
-      precioSmall: 1.9,
-      precioLarge: 2.4,
-      imagen: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400',
-      tamanoSeleccionado: 'small',
-      cantidad: 1,
-    },
-  ];
+  // Variables para dibujar la gráfica dinámica
+  puntosSvg: string = 'M0,45 L100,45';
+  puntosCirculos: {x: number, y: number, hora: string}[] = [];
 
   constructor(
-    public cart: CartService,
     private authService: AuthService,
     private router: Router,
     private http: HttpClient
@@ -172,180 +38,80 @@ export class Homescreen implements OnInit {
 
   ngOnInit(): void {
     this.authService.me().subscribe({
-      next: (res) => {
-        this.usuarioActual = res.usuario.nombre_us || 'Administrador';
-      },
-      error: () => {
-        this.router.navigate(['/inicio-sesion']);
-      }
+      next: (res) => this.usuarioActual = res.usuario.nombre_us || 'Administrador',
+      error: () => this.router.navigate(['/inicio-sesion'])
+    });
+    this.cargarDashboardCompleto();
+  }
+
+cargarDashboardCompleto(): void {
+    // Usamos rutas relativas (sin el http://localhost:3000) para que el Proxy funcione
+    this.http.get<any>('/api/dashboard/stats', { withCredentials: true }).subscribe({ 
+      next: (res) => this.stats = res,
+      error: (err) => console.error("Error stats:", err)
     });
 
-    this.cargarEstadisticas();
-    this.cargarCajerosActivos();
+    this.http.get<any[]>('/api/dashboard/cajeros-activos', { withCredentials: true }).subscribe({ 
+      next: (res) => this.cajerosActivos = res 
+    });
+
+    this.http.get<any[]>('/api/dashboard/inventario-bajo', { withCredentials: true }).subscribe({ 
+      next: (res) => this.inventarioBajoLista = res 
+    });
+
+    this.http.get<any[]>('/api/dashboard/turnos-recientes', { withCredentials: true }).subscribe({ 
+      next: (res) => this.turnosRecientes = res 
+    });
+
+    this.http.get<any[]>('/api/dashboard/ventas-recientes', { withCredentials: true }).subscribe({ 
+      next: (res) => this.ventasRecientes = res 
+    });
+
+    this.http.get<any[]>('/api/dashboard/grafica', { withCredentials: true }).subscribe({ 
+      next: (res) => this.procesarGrafica(res) 
+    });
   }
 
-  cargarEstadisticas(): void {
-    this.http.get('http://localhost:3000/api/dashboard/stats', { withCredentials: true })
-      .subscribe({
-        next: (res: any) => {
-          this.stats = res;
-        },
-        error: (err) => console.error('Error al cargar métricas del dashboard:', err)
-      });
+  // Lógica para dibujar la línea de la gráfica basada en los montos
+  procesarGrafica(datos: any[]): void {
+    if (!datos || datos.length === 0) return;
+    const maxVenta = Math.max(...datos.map(d => parseFloat(d.total_vendido))) || 1;
+    
+    this.puntosCirculos = datos.map((d, i) => {
+      const x = (i / (datos.length - 1 || 1)) * 100;
+      const y = 45 - ((parseFloat(d.total_vendido) / maxVenta) * 35);
+      return { x, y, hora: `${d.hora}:00` };
+    });
+
+    if (this.puntosCirculos.length > 0) {
+      let path = `M${this.puntosCirculos[0].x},${this.puntosCirculos[0].y}`;
+      for(let i=1; i<this.puntosCirculos.length; i++) {
+        path += ` L${this.puntosCirculos[i].x},${this.puntosCirculos[i].y}`;
+      }
+      this.puntosSvg = path;
+    }
   }
 
-  cargarCajerosActivos(): void {
-    this.http.get<CajeroActivo[]>('http://localhost:3000/api/dashboard/cajeros-activos', { withCredentials: true })
-      .subscribe({
-        next: (res) => {
-          this.cajerosActivos = res;
-        },
-        error: (err) => console.error('Error al cargar cajeros activos:', err)
-      });
+  // Función maestra para hacer que TODOS los botones funcionen
+  irA(ruta: string): void {
+    this.router.navigate([ruta]);
   }
 
+  // Utilidades visuales
   iniciales(nombre: string, apellido: string): string {
     return `${nombre?.charAt(0) ?? ''}${apellido?.charAt(0) ?? ''}`.toUpperCase();
   }
-
   colorAvatar(id: number): string {
-    const colores = [
-      'bg-emerald-100 text-emerald-700',
-      'bg-blue-100 text-blue-700',
-      'bg-amber-100 text-amber-700',
-      'bg-violet-100 text-violet-700',
-    ];
+    const colores = ['bg-emerald-100 text-emerald-700', 'bg-blue-100 text-blue-700', 'bg-amber-100 text-amber-700', 'bg-violet-100 text-violet-700'];
     return colores[id % colores.length];
   }
-
-  horaInicio(fecha: string): string {
+  formatoHora(fecha: string): string {
+    if(!fecha) return '--:--';
     return new Date(fecha).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
   }
-
   cerrarSesion(): void {
     this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/inicio-sesion']);
-      },
-      error: (err) => console.error('Error al cerrar sesión', err)
-    });
-  }
-
-  abrirFiltro(): void {
-    console.log('Filtrando con:', this.terminoBusqueda);
-  }
-
-  seleccionarTamano(producto: Producto, tamano: 'small' | 'large'): void {
-    producto.tamanoSeleccionado = tamano;
-  }
-
-  precioActual(producto: Producto): number {
-    return producto.tamanoSeleccionado === 'small' ? producto.precioSmall : producto.precioLarge;
-  }
-
-  aumentarCantidad(producto: Producto): void {
-    producto.cantidad++;
-  }
-
-  disminuirCantidad(producto: Producto): void {
-    if (producto.cantidad > 1) {
-      producto.cantidad--;
-    }
-  }
-
-  async preguntarCantidadYAgregar(producto: Producto): Promise<void> {
-    let cantidadSeleccionada = 0;
-
-    const result = await Swal.fire({
-      title: `¿Cuántos "${producto.nombre}" deseas agregar?`,
-      html: `
-        <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-top:12px;">
-          <button type="button" id="btn-menos"
-            style="width:44px;height:44px;border-radius:12px;border:none;background:#f1f5f9;color:#334155;font-size:22px;font-weight:bold;cursor:pointer;line-height:1;">
-            −
-          </button>
-          <span id="contador-cantidad"
-            style="min-width:48px;text-align:center;font-size:32px;font-weight:700;color:#20140C;">
-            0
-          </span>
-          <button type="button" id="btn-mas"
-            style="width:44px;height:44px;border-radius:12px;border:none;background:#6F4E37;color:#fff;font-size:22px;font-weight:bold;cursor:pointer;line-height:1;">
-            +
-          </button>
-        </div>
-      `,
-      showCancelButton: true,
-      confirmButtonText: 'Agregar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#6F4E37',
-      cancelButtonColor: '#94a3b8',
-      didOpen: () => {
-        const popup = Swal.getPopup();
-        const contador = popup?.querySelector('#contador-cantidad') as HTMLElement;
-        const btnMenos = popup?.querySelector('#btn-menos') as HTMLButtonElement;
-        const btnMas = popup?.querySelector('#btn-mas') as HTMLButtonElement;
-
-        btnMenos.addEventListener('click', () => {
-          if (cantidadSeleccionada > 0) {
-            cantidadSeleccionada--;
-            contador.textContent = String(cantidadSeleccionada);
-          }
-        });
-
-        btnMas.addEventListener('click', () => {
-          cantidadSeleccionada++;
-          contador.textContent = String(cantidadSeleccionada);
-        });
-      },
-      preConfirm: () => {
-        if (cantidadSeleccionada < 1) {
-          Swal.showValidationMessage('Selecciona al menos 1 producto');
-          return false;
-        }
-        return cantidadSeleccionada;
-      },
-    });
-
-    if (result.isConfirmed) {
-      const cantidadNum = result.value as number;
-
-      this.cart.agregar({
-        idProducto: producto.id,
-        nombre: producto.nombre,
-        tamano: producto.tamanoSeleccionado,
-        precioUnitario: this.precioActual(producto),
-        cantidad: cantidadNum,
-      });
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Producto agregado',
-        text: `${producto.nombre} (${producto.tamanoSeleccionado}) x${cantidadNum}`,
-        timer: 1500,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end',
-      });
-    }
-  }
-
-  agregarAlCarrito(producto: Producto): void {
-    this.cart.agregar({
-      idProducto: producto.id,
-      nombre: producto.nombre,
-      tamano: producto.tamanoSeleccionado,
-      precioUnitario: this.precioActual(producto),
-      cantidad: producto.cantidad,
-    });
-
-    Swal.fire({
-      icon: 'success',
-      title: 'Producto agregado',
-      text: `${producto.nombre} (${producto.tamanoSeleccionado}) x${producto.cantidad}`,
-      timer: 1500,
-      showConfirmButton: false,
-      toast: true,
-      position: 'top-end',
+      next: () => this.router.navigate(['/inicio-sesion'])
     });
   }
 }

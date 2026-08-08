@@ -21,10 +21,8 @@ export interface LoginPayload {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Ruta relativa: el proxy de Angular la reenvia a http://localhost:3000/api
-
-  // Ruta absoluta: se usa en producción, apuntando al backend real
-  private readonly baseUrl = environment.authApi;
+  // Se usa environment.authApi o por defecto '/api' para que el proxy de Angular maneje las peticiones y las cookies correctamente
+  private readonly baseUrl = environment.authApi || '/api';
 
   constructor(private http: HttpClient) {}
 
@@ -40,15 +38,14 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/logout`, {}, { withCredentials: true });
   }
 
-  // El AuthGuard usa esto para saber si hay sesion activa.
+  // El AuthGuard usa esto para saber si hay sesión activa.
   // Como la cookie es httpOnly, Angular no puede leerla directo;
-  // preguntamos al backend y el confirma segun el JWT de la cookie.
+  // preguntamos al backend y él confirma según el JWT de la cookie.
   me(): Observable<any> {
     return this.http.get(`${this.baseUrl}/me`, { withCredentials: true });
   }
 
-
   loginConGoogle(credential: string): Observable<any> {
-  return this.http.post(`${this.baseUrl}/auth/google`, { credential }, { withCredentials: true });
-}
+    return this.http.post(`${this.baseUrl}/auth/google`, { credential }, { withCredentials: true });
+  }
 }
