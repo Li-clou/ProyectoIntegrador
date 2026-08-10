@@ -6,6 +6,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth.services';
 import { CajerosModal } from '../../components/cajeros-modal/cajeros-modal';
+import { environment } from '../../../environments/enviroments';
 
 @Component({
   selector: 'app-homescreen',
@@ -20,7 +21,6 @@ export class Homescreen implements OnInit {
   usuarioActual: string = 'Cargando...';
   fechaActual: Date = new Date();
 
-  // Variables para almacenar los datos reales
   stats: any = {
     ventasDia: 0,
     transacciones: 0,
@@ -31,11 +31,12 @@ export class Homescreen implements OnInit {
   cajerosActivos: any[] = [];
   inventarioBajoLista: any[] = [];
   turnosRecientes: any[] = [];
-  ventasRecientes: any[] = []; // Para la bitácora
+  ventasRecientes: any[] = [];
 
-  // Variables para dibujar la gráfica dinámica
   puntosSvg: string = 'M0,45 L100,45';
   puntosCirculos: { x: number; y: number; hora: string }[] = [];
+
+  private readonly dashboardUrl = environment.authApi + '/dashboard';
 
   constructor(
     private authService: AuthService,
@@ -52,34 +53,32 @@ export class Homescreen implements OnInit {
   }
 
   cargarDashboardCompleto(): void {
-    // Usamos rutas relativas (sin el http://localhost:3000) para que el Proxy funcione
-    this.http.get<any>('/api/dashboard/stats', { withCredentials: true }).subscribe({
+    this.http.get<any>(`${this.dashboardUrl}/stats`).subscribe({
       next: (res) => (this.stats = res),
       error: (err) => console.error('Error stats:', err),
     });
 
-    this.http.get<any[]>('/api/dashboard/cajeros-activos', { withCredentials: true }).subscribe({
+    this.http.get<any[]>(`${this.dashboardUrl}/cajeros-activos`).subscribe({
       next: (res) => (this.cajerosActivos = res),
     });
 
-    this.http.get<any[]>('/api/dashboard/inventario-bajo', { withCredentials: true }).subscribe({
+    this.http.get<any[]>(`${this.dashboardUrl}/inventario-bajo`).subscribe({
       next: (res) => (this.inventarioBajoLista = res),
     });
 
-    this.http.get<any[]>('/api/dashboard/turnos-recientes', { withCredentials: true }).subscribe({
+    this.http.get<any[]>(`${this.dashboardUrl}/turnos-recientes`).subscribe({
       next: (res) => (this.turnosRecientes = res),
     });
 
-    this.http.get<any[]>('/api/dashboard/ventas-recientes', { withCredentials: true }).subscribe({
+    this.http.get<any[]>(`${this.dashboardUrl}/ventas-recientes`).subscribe({
       next: (res) => (this.ventasRecientes = res),
     });
 
-    this.http.get<any[]>('/api/dashboard/grafica', { withCredentials: true }).subscribe({
+    this.http.get<any[]>(`${this.dashboardUrl}/grafica`).subscribe({
       next: (res) => this.procesarGrafica(res),
     });
   }
 
-  // Lógica para dibujar la línea de la gráfica basada en los montos
   procesarGrafica(datos: any[]): void {
     if (!datos || datos.length === 0) return;
     const maxVenta = Math.max(...datos.map((d) => parseFloat(d.total_vendido))) || 1;
@@ -99,12 +98,10 @@ export class Homescreen implements OnInit {
     }
   }
 
-  // Función maestra para hacer que TODOS los botones funcionen
   irA(ruta: string): void {
     this.router.navigate([ruta]);
   }
 
-  // Utilidades visuales
   iniciales(nombre: string, apellido: string): string {
     return `${nombre?.charAt(0) ?? ''}${apellido?.charAt(0) ?? ''}`.toUpperCase();
   }
