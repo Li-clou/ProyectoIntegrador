@@ -42,18 +42,14 @@ export async function crear(req, res, next) {
         next(err);
     }
 }
-
-// NUEVO: listado según rol
 export async function listar(req, res, next) {
     try {
-        const { fecha_inicio, fecha_fin, id_usuario } = req.query;
-        const filtros = { fecha_inicio, fecha_fin };
+        const { rango, id_usuario } = req.query;
+        const filtros = { rango };
 
         if (req.usuario.rol === 'admin') {
-            // El admin puede filtrar por un cajero en particular si lo pide
             if (id_usuario) filtros.id_usuario = id_usuario;
         } else {
-            // Un cajero SIEMPRE ve solo lo suyo, sin importar qué mande en la query
             filtros.id_usuario = req.usuario.id_usuario;
         }
 
