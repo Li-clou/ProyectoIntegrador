@@ -33,7 +33,7 @@ export async function login(req, res) {
         // ==========================================
         // 2. LÓGICA DE TURNOS (SOLO PARA CAJEROS)
         // ==========================================
-        const user = resultado.usuario; // Extraemos la info del usuario devuelta por tu servicio
+        const user = resultado.usuario;
         if (!user.rol) {
             return res.status(500).json({ error: 'El usuario no tiene un rol asignado. Contacta al administrador.' });
         }
@@ -50,13 +50,11 @@ export async function login(req, res) {
         }
         // ==========================================
 
-        // 3. Generamos la cookie con el token
-        res.cookie('token', resultado.token, {
-            httpOnly: true, sameSite: 'none',
-             secure: process.env.NODE_ENV === 'production', 
-             maxAge: 8 * 60 * 60 * 1000,
-        });
-        res.json({ usuario: resultado.usuario });
+        // 3. Ya NO ponemos cookie. Cada microservicio vive en un subdominio
+        // distinto de Railway y las cookies no cruzan entre subdominios.
+        // Mandamos el token directo en el JSON; el frontend lo guarda y lo
+        // manda como header Authorization en cada request.
+        res.json({ usuario: resultado.usuario, token: resultado.token });
     } catch (err) {
         console.error('Error en login:', err);
         res.status(500).json({ error: 'Error interno al iniciar sesión' });
@@ -64,8 +62,8 @@ export async function login(req, res) {
 }
 
 export async function logout(req, res) {
-
-    res.clearCookie('token', { httpOnly: true, sameSite: 'none', secure: true });
+    // Ya no hay cookie de servidor que limpiar. El frontend simplemente
+    // borra el token que tenía guardado (localStorage/signal/lo que uses).
     res.json({ message: 'Sesión cerrada' });
 }
 
