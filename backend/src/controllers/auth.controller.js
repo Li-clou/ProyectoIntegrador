@@ -52,7 +52,9 @@ export async function login(req, res) {
 
         // 3. Generamos la cookie con el token
         res.cookie('token', resultado.token, {
-            httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 8 * 60 * 60 * 1000,
+            httpOnly: true, sameSite: 'none',
+             secure: process.env.NODE_ENV === 'production', 
+             maxAge: 8 * 60 * 60 * 1000,
         });
         res.json({ usuario: resultado.usuario });
     } catch (err) {
@@ -62,7 +64,8 @@ export async function login(req, res) {
 }
 
 export async function logout(req, res) {
-    res.clearCookie('token');
+
+    res.clearCookie('token', { httpOnly: true, sameSite: 'none', secure: true });
     res.json({ message: 'Sesión cerrada' });
 }
 
