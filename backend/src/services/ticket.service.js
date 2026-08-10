@@ -1,4 +1,4 @@
-import PDFDocument from "pdfkit";
+ import PDFDocument from "pdfkit";
 import nodemailer from "nodemailer";
 import { NEGOCIO } from "../config/negocio.js";
 
@@ -10,6 +10,8 @@ const transporter = nodemailer.createTransport({
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD,
     },
+     family: 4, // 👈 fuerza IPv4, evita ENETUNREACH en Railway (IPv6)
+    connectionTimeout: 10000, //  
 });
 
 const MARGEN = 14;
