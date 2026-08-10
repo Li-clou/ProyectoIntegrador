@@ -26,6 +26,7 @@ export class Homescreen implements OnInit {
   fechaActual: Date = new Date();
   cargando = true;
 
+  
   stats: any = {
     ventasDia: 0,
     transacciones: 0,

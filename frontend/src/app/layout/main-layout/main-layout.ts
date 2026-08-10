@@ -2,13 +2,14 @@ import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/cor
 import { RouterOutlet, Router } from '@angular/router';
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { AuthService } from '../../services/auth.services';
+import { NotificacionesBell } from '../../components/notificaciones-bell/notificaciones-bell';
 
 type Rol = 'admin' | 'cajero' | 'pendiente';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, Sidebar],
+  imports: [RouterOutlet, Sidebar, NotificacionesBell],
   templateUrl: './main-layout.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './main-layout.css',

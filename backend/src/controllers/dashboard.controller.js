@@ -61,7 +61,6 @@ export const getGraficaVentas = async (req, res) => {
         res.status(500).json({ error: 'Error grafica' });
     }
 };
-
 export const getInventarioBajoDetalle = async (req, res) => {
     try {
         const result = await pool.query(`
@@ -69,11 +68,13 @@ export const getInventarioBajoDetalle = async (req, res) => {
                    p.nombre_producto AS nombre_p, 
                    p.existencia, 
                    p.stock_minimo, 
-                   m.nombre_marca AS marca
+                   m.nombre_marca AS marca,
+                   (p.existencia <= 0) AS agotado
             FROM productos p 
             LEFT JOIN marcas m ON p.id_marca_producto = m.id_marca
             WHERE p.existencia <= p.stock_minimo 
-            LIMIT 5
+            ORDER BY p.existencia ASC
+            LIMIT 20
         `);
         res.json(result.rows);
     } catch (error) {
@@ -110,3 +111,4 @@ export const getVentasRecientes = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener ventas recientes' });
     }
 };
+

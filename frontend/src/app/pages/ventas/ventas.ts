@@ -61,25 +61,7 @@ export class VentasComponent implements OnInit {
     return this.rol === 'admin';
   }
 
-  private rangoAFechas(): { fecha_inicio?: string } {
-    if (this.rango === 'todos') return {};
-
-    const inicio = new Date();
-
-    if (this.rango === 'hoy') {
-      inicio.setHours(0, 0, 0, 0);
-    } else if (this.rango === 'semana') {
-      const dia = inicio.getDay();
-      const diff = dia === 0 ? 6 : dia - 1; // lunes como inicio de semana
-      inicio.setDate(inicio.getDate() - diff);
-      inicio.setHours(0, 0, 0, 0);
-    } else if (this.rango === 'mes') {
-      inicio.setDate(1);
-      inicio.setHours(0, 0, 0, 0);
-    }
-
-    return { fecha_inicio: inicio.toISOString() };
-  }
+ 
 
   cargarCajeros(): void {
     this.usuariosService.listar().subscribe({
@@ -90,12 +72,12 @@ export class VentasComponent implements OnInit {
       error: () => {},
     });
   }
-
-  cargarVentas(): void {
+cargarVentas(): void {
     this.cargando = true;
     this.errorMsg = '';
 
-    const filtros: any = this.rangoAFechas();
+    const filtros: any = {};
+    if (this.rango !== 'todos') filtros.rango = this.rango;
     if (this.esAdmin && this.filtroCajero !== 'Todos') {
       filtros.id_usuario = this.filtroCajero;
     }
@@ -112,8 +94,7 @@ export class VentasComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
-  }
-
+}
   cambiarRango(rango: RangoFecha): void {
     this.rango = rango;
     this.cargarVentas();

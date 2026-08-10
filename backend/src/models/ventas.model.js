@@ -137,8 +137,7 @@ export async function obtenerVentaCompleta(id_venta) {
     return { ...ventaResult.rows[0], items: itemsResult.rows };
 }
 
-
-export async function listarVentas({ id_usuario, fecha_inicio, fecha_fin } = {}) {
+export async function listarVentas({ id_usuario, fecha_inicio, fecha_fin, rango } = {}) {
     const condiciones = [];
     const valores = [];
 
@@ -146,13 +145,25 @@ export async function listarVentas({ id_usuario, fecha_inicio, fecha_fin } = {})
         valores.push(id_usuario);
         condiciones.push(`id_usuario_v = $${valores.length}`);
     }
-    if (fecha_inicio) {
-        valores.push(fecha_inicio);
-        condiciones.push(`fecha_v >= $${valores.length}`);
-    }
-    if (fecha_fin) {
-        valores.push(fecha_fin);
-        condiciones.push(`fecha_v <= $${valores.length}`);
+
+    // Dejamos que Postgres calcule el corte con su propio reloj/timezone,
+    // así evitamos desfases entre la hora del navegador y el servidor.
+    if (rango === 'hoy') {
+        condiciones.push(`fecha_v >= date_trunc('day', NOW())`);
+    } else if (rango === 'semana') {
+        condiciones.push(`fecha_v >= date_trunc('week', NOW())`);
+    } else if (rango === 'mes') {
+        condiciones.push(`fecha_v >= date_trunc('month', NOW())`);
+    } else {
+        // fallback por si algún día se necesita un rango manual
+        if (fecha_inicio) {
+            valores.push(fecha_inicio);
+            condiciones.push(`fecha_v >= $${valores.length}`);
+        }
+        if (fecha_fin) {
+            valores.push(fecha_fin);
+            condiciones.push(`fecha_v <= $${valores.length}`);
+        }
     }
 
     let sql = `SELECT * FROM vista_ventas_resumen`;
