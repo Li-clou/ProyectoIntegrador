@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,10 +9,10 @@ import Swal from 'sweetalert2';
   selector: 'app-registro-cliente',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './register.html',
 })
 export class RegistroCliente {
-
   nombre_us: string = '';
   ap_us: string = '';
   am_us: string = '';
@@ -36,7 +36,7 @@ export class RegistroCliente {
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   // ===================== VALIDACIONES DE CONTRASEÑA =====================
@@ -85,7 +85,10 @@ export class RegistroCliente {
   }
 
   get usuarioValido(): boolean {
-    return this.usuario.length === 0 || (this.usuario.length >= 4 && this.REGEX_USUARIO.test(this.usuario));
+    return (
+      this.usuario.length === 0 ||
+      (this.usuario.length >= 4 && this.REGEX_USUARIO.test(this.usuario))
+    );
   }
 
   // ===================== VALIDACIÓN GENERAL AL ENVIAR =====================
@@ -137,33 +140,35 @@ export class RegistroCliente {
 
     this.cargando = true;
 
-    this.authService.registrarCliente({
-      nombre_us: this.nombre_us,
-      ap_us: this.ap_us,
-      am_us: this.am_us,
-      direccion: this.direccion,
-      telefono: this.telefono,
-      usuario: this.usuario,
-      password: this.password,
-      rol: this.rol
-    }).subscribe({
-      next: () => {
-        this.cargando = false;
+    this.authService
+      .registrarCliente({
+        nombre_us: this.nombre_us,
+        ap_us: this.ap_us,
+        am_us: this.am_us,
+        direccion: this.direccion,
+        telefono: this.telefono,
+        usuario: this.usuario,
+        password: this.password,
+        rol: this.rol,
+      })
+      .subscribe({
+        next: () => {
+          this.cargando = false;
 
-        Swal.fire({
-          icon: 'success',
-          title: '¡Cuenta creada!',
-          text: 'Tu cuenta se registró correctamente. Ahora un administrador debe asignarte un rol antes de que puedas iniciar sesión.',
-          confirmButtonColor: '#4A3B32'
-        }).then(() => {
-          this.router.navigate(['/inicio-sesion']);
-        });
-      },
-      error: (err) => {
-        this.cargando = false;
-        this.errorMsg = err.error?.error || 'Ocurrió un error al registrar, intenta de nuevo';
-      }
-    });
+          Swal.fire({
+            icon: 'success',
+            title: '¡Cuenta creada!',
+            text: 'Tu cuenta se registró correctamente. Ahora un administrador debe asignarte un rol antes de que puedas iniciar sesión.',
+            confirmButtonColor: '#4A3B32',
+          }).then(() => {
+            this.router.navigate(['/inicio-sesion']);
+          });
+        },
+        error: (err) => {
+          this.cargando = false;
+          this.errorMsg = err.error?.error || 'Ocurrió un error al registrar, intenta de nuevo';
+        },
+      });
   }
 
   onVolverLogin(): void {

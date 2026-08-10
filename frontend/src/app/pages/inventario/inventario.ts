@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -11,10 +11,10 @@ import { Producto, Marca, Proveedor } from '../../models/producto.models';
   selector: 'app-inventario',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './inventario.html',
 })
 export class InventarioComponent implements OnInit {
-
   productos: Producto[] = [];
   productosFiltrados: Producto[] = [];
   marcas: Marca[] = [];
@@ -40,7 +40,7 @@ export class InventarioComponent implements OnInit {
     private productosService: ProductosService,
     private marcasService: MarcasService,
     private proveedorService: ProveedorService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -64,21 +64,27 @@ export class InventarioComponent implements OnInit {
         this.errorMsg = err.error?.error || 'No se pudieron cargar los productos';
         this.cargando = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
   cargarMarcas(): void {
     this.marcasService.listar().subscribe({
-      next: (data) => { this.marcas = data; this.cdr.detectChanges(); },
-      error: () => {}
+      next: (data) => {
+        this.marcas = data;
+        this.cdr.detectChanges();
+      },
+      error: () => {},
     });
   }
 
   cargarProveedores(): void {
     this.proveedorService.listar().subscribe({
-      next: (data) => { this.proveedores = data; this.cdr.detectChanges(); },
-      error: () => {}
+      next: (data) => {
+        this.proveedores = data;
+        this.cdr.detectChanges();
+      },
+      error: () => {},
     });
   }
 
@@ -86,7 +92,7 @@ export class InventarioComponent implements OnInit {
   aplicarFiltros(): void {
     const texto = this.busqueda.trim().toLowerCase();
 
-    this.productosFiltrados = this.productos.filter(p => {
+    this.productosFiltrados = this.productos.filter((p) => {
       const coincideTexto =
         !texto ||
         p.nombre_producto.toLowerCase().includes(texto) ||
@@ -117,11 +123,11 @@ export class InventarioComponent implements OnInit {
   }
 
   get totalStockBajo(): number {
-    return this.productos.filter(p => p.existencia <= p.stock_minimo).length;
+    return this.productos.filter((p) => p.existencia <= p.stock_minimo).length;
   }
 
   get valorInventario(): number {
-    return this.productos.reduce((acc, p) => acc + (p.precio_venta * p.existencia), 0);
+    return this.productos.reduce((acc, p) => acc + p.precio_venta * p.existencia, 0);
   }
 
   // ===================== HELPERS DE VISTA =====================
@@ -183,19 +189,25 @@ export class InventarioComponent implements OnInit {
     this.cargando = true;
 
     if (this.modoEdicion && this.productoSeleccionado.id_producto) {
-      this.productosService.actualizar(this.productoSeleccionado.id_producto, this.productoSeleccionado).subscribe({
-        next: () => {
-          this.cargando = false;
-          this.cerrarModal();
-          Swal.fire({ icon: 'success', title: 'Producto actualizado', confirmButtonColor: '#4A3B32' });
-          this.cargarProductos();
-        },
-        error: (err) => {
-          this.cargando = false;
-          this.errorMsg = err.error?.error || 'Error al actualizar el producto';
-          this.cdr.detectChanges();
-        }
-      });
+      this.productosService
+        .actualizar(this.productoSeleccionado.id_producto, this.productoSeleccionado)
+        .subscribe({
+          next: () => {
+            this.cargando = false;
+            this.cerrarModal();
+            Swal.fire({
+              icon: 'success',
+              title: 'Producto actualizado',
+              confirmButtonColor: '#4A3B32',
+            });
+            this.cargarProductos();
+          },
+          error: (err) => {
+            this.cargando = false;
+            this.errorMsg = err.error?.error || 'Error al actualizar el producto';
+            this.cdr.detectChanges();
+          },
+        });
     } else {
       this.productosService.crear(this.productoSeleccionado).subscribe({
         next: () => {
@@ -208,7 +220,7 @@ export class InventarioComponent implements OnInit {
           this.cargando = false;
           this.errorMsg = err.error?.error || 'Error al crear el producto';
           this.cdr.detectChanges();
-        }
+        },
       });
     }
   }
@@ -222,17 +234,26 @@ export class InventarioComponent implements OnInit {
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#4A3B32'
-    }).then(result => {
+      cancelButtonColor: '#4A3B32',
+    }).then((result) => {
       if (result.isConfirmed && producto.id_producto) {
         this.productosService.eliminar(producto.id_producto).subscribe({
           next: () => {
-            Swal.fire({ icon: 'success', title: 'Producto eliminado', confirmButtonColor: '#4A3B32' });
+            Swal.fire({
+              icon: 'success',
+              title: 'Producto eliminado',
+              confirmButtonColor: '#4A3B32',
+            });
             this.cargarProductos();
           },
           error: (err) => {
-            Swal.fire({ icon: 'error', title: 'No se pudo eliminar', text: err.error?.error || '', confirmButtonColor: '#4A3B32' });
-          }
+            Swal.fire({
+              icon: 'error',
+              title: 'No se pudo eliminar',
+              text: err.error?.error || '',
+              confirmButtonColor: '#4A3B32',
+            });
+          },
         });
       }
     });
@@ -259,16 +280,18 @@ export class InventarioComponent implements OnInit {
       return;
     }
 
-    this.productosService.ajustarStock(this.productoAjuste.id_producto, this.cantidadAjuste, this.tipoAjuste).subscribe({
-      next: () => {
-        this.cerrarAjusteStock();
-        Swal.fire({ icon: 'success', title: 'Stock actualizado', confirmButtonColor: '#4A3B32' });
-        this.cargarProductos();
-      },
-      error: (err) => {
-        this.errorMsg = err.error?.error || 'No se pudo ajustar el stock';
-        this.cdr.detectChanges();
-      }
-    });
+    this.productosService
+      .ajustarStock(this.productoAjuste.id_producto, this.cantidadAjuste, this.tipoAjuste)
+      .subscribe({
+        next: () => {
+          this.cerrarAjusteStock();
+          Swal.fire({ icon: 'success', title: 'Stock actualizado', confirmButtonColor: '#4A3B32' });
+          this.cargarProductos();
+        },
+        error: (err) => {
+          this.errorMsg = err.error?.error || 'No se pudo ajustar el stock';
+          this.cdr.detectChanges();
+        },
+      });
   }
 }

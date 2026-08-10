@@ -1,2 +1,53 @@
-import { Component, OnInit } from '@angular/core'; import { CommonModule } from '@angular/common'; import { FormsModule } from '@angular/forms'; import { TurnosService } from '../../services/turnos.service'; import { AuthService } from '../../services/auth.services';
-@Component({selector:'app-turnos',standalone:true,imports:[CommonModule,FormsModule],templateUrl:'./turnos.html'}) export class TurnosComponent implements OnInit {turnos:any[]=[];actual:any=null;tipo='matutino';inicial=0;final=0;esAdmin=false;error='';constructor(private api:TurnosService,private auth:AuthService){}ngOnInit(){this.auth.me().subscribe(r=>{this.esAdmin=r.usuario.rol==='admin';this.cargar();});}cargar(){this.api.actual().subscribe(x=>this.actual=x);if(this.esAdmin)this.api.listar().subscribe(x=>this.turnos=x);}abrir(){this.api.abrir(this.tipo,this.inicial).subscribe({next:x=>{this.actual=x;this.cargar();},error:e=>this.error=e.error?.error||'No se pudo abrir'});}cerrar(){this.api.cerrar(this.actual.id_turno,this.final).subscribe({next:()=>{this.actual=null;this.cargar();},error:e=>this.error=e.error?.error||'No se pudo cerrar'});}}
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { TurnosService } from '../../services/turnos.service';
+import { AuthService } from '../../services/auth.services';
+@Component({
+  selector: 'app-turnos',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './turnos.html',
+})
+export class TurnosComponent implements OnInit {
+  turnos: any[] = [];
+  actual: any = null;
+  tipo = 'matutino';
+  inicial = 0;
+  final = 0;
+  esAdmin = false;
+  error = '';
+  constructor(
+    private api: TurnosService,
+    private auth: AuthService,
+  ) {}
+  ngOnInit() {
+    this.auth.me().subscribe((r) => {
+      this.esAdmin = r.usuario.rol === 'admin';
+      this.cargar();
+    });
+  }
+  cargar() {
+    this.api.actual().subscribe((x) => (this.actual = x));
+    if (this.esAdmin) this.api.listar().subscribe((x) => (this.turnos = x));
+  }
+  abrir() {
+    this.api.abrir(this.tipo, this.inicial).subscribe({
+      next: (x) => {
+        this.actual = x;
+        this.cargar();
+      },
+      error: (e) => (this.error = e.error?.error || 'No se pudo abrir'),
+    });
+  }
+  cerrar() {
+    this.api.cerrar(this.actual.id_turno, this.final).subscribe({
+      next: () => {
+        this.actual = null;
+        this.cargar();
+      },
+      error: (e) => (this.error = e.error?.error || 'No se pudo cerrar'),
+    });
+  }
+}

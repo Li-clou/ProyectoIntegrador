@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VentasService } from '../../services/ventas.service';
@@ -14,10 +14,10 @@ type Rol = 'admin' | 'cajero' | 'pendiente';
   selector: 'app-ventas',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './ventas.html',
 })
 export class VentasComponent implements OnInit {
-
   ventas: VentaResumen[] = [];
   cajeros: Usuario[] = [];
 
@@ -38,7 +38,7 @@ export class VentasComponent implements OnInit {
     private ventasService: VentasService,
     private usuariosService: UsuariosService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -53,7 +53,7 @@ export class VentasComponent implements OnInit {
       error: () => {
         this.rol = 'cajero';
         this.cargarVentas();
-      }
+      },
     });
   }
 
@@ -84,10 +84,10 @@ export class VentasComponent implements OnInit {
   cargarCajeros(): void {
     this.usuariosService.listar().subscribe({
       next: (data) => {
-        this.cajeros = data.filter(u => u.rol === 'cajero');
+        this.cajeros = data.filter((u) => u.rol === 'cajero');
         this.cdr.detectChanges();
       },
-      error: () => {}
+      error: () => {},
     });
   }
 
@@ -110,7 +110,7 @@ export class VentasComponent implements OnInit {
         this.errorMsg = err.error?.error || 'No se pudieron cargar las ventas';
         this.cargando = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -127,9 +127,10 @@ export class VentasComponent implements OnInit {
   get ventasFiltradas(): VentaResumen[] {
     const texto = this.busqueda.trim().toLowerCase();
     if (!texto) return this.ventas;
-    return this.ventas.filter(v =>
-      String(v.id_venta).includes(texto) ||
-      `${v.nombre_us ?? ''} ${v.ap_us ?? ''}`.toLowerCase().includes(texto)
+    return this.ventas.filter(
+      (v) =>
+        String(v.id_venta).includes(texto) ||
+        `${v.nombre_us ?? ''} ${v.ap_us ?? ''}`.toLowerCase().includes(texto),
     );
   }
 
@@ -150,14 +151,23 @@ export class VentasComponent implements OnInit {
   }
 
   colorAvatar(v: VentaResumen): string {
-    const colores = ['bg-emerald-100 text-emerald-700', 'bg-sky-100 text-sky-700', 'bg-amber-100 text-amber-700', 'bg-violet-100 text-violet-700'];
+    const colores = [
+      'bg-emerald-100 text-emerald-700',
+      'bg-sky-100 text-sky-700',
+      'bg-amber-100 text-amber-700',
+      'bg-violet-100 text-violet-700',
+    ];
     const index = (v.id_usuario_v ?? 0) % colores.length;
     return colores[index];
   }
 
   etiquetaMetodo(metodo: string): string {
     const mapa: Record<string, string> = {
-      efectivo: 'Efectivo', tarjeta: 'Tarjeta', qr: 'QR', vales: 'Vales', credito: 'Crédito',
+      efectivo: 'Efectivo',
+      tarjeta: 'Tarjeta',
+      qr: 'QR',
+      vales: 'Vales',
+      credito: 'Crédito',
     };
     return mapa[metodo] || metodo;
   }
@@ -188,7 +198,7 @@ export class VentasComponent implements OnInit {
         this.cargandoDetalle = false;
         this.errorMsg = err.error?.error || 'No se pudo cargar el detalle de la venta';
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -209,7 +219,7 @@ export class VentasComponent implements OnInit {
       },
       error: () => {
         this.errorMsg = 'No se pudo generar el ticket';
-      }
+      },
     });
   }
 }

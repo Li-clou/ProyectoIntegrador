@@ -25,9 +25,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "styles": ["src/styles.css"]
           },
           "configurations": {
             "production": {
@@ -49,7 +47,8 @@
                   "replace": "src/environments/enviroments.ts",
                   "with": "src/environments/enviroments.prod.ts"
                 }
-              ]
+              ],
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,

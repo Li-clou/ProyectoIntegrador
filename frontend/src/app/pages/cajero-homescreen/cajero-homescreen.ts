@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -23,6 +23,7 @@ const IMAGEN_DEFECTO = 'https://images.unsplash.com/photo-1495474472287-4d71bcdd
   standalone: true,
   imports: [CommonModule, FormsModule, CheckoutPanel],
   templateUrl: './cajero-homescreen.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './cajero-homescreen.css',
 })
 export class Homescreen implements OnInit {
@@ -35,7 +36,10 @@ export class Homescreen implements OnInit {
   productos: ProductoUI[] = [];
   private productosOriginales: ProductoUI[] = [];
 
-  constructor(public cart: CartService, private productosService: ProductosService) {}
+  constructor(
+    public cart: CartService,
+    private productosService: ProductosService,
+  ) {}
 
   ngOnInit(): void {
     this.cargarProductos();

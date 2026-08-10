@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CartService } from '../../services/cart.service';
@@ -8,6 +8,7 @@ import { VentasService } from '../../services/ventas.service';
   selector: 'app-checkout-panel',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './checkout-panel.html',
 })
 export class CheckoutPanel {
@@ -21,7 +22,10 @@ export class CheckoutPanel {
   errorMsg = '';
   exito = false;
 
-  constructor(public cart: CartService, private ventasService: VentasService) {}
+  constructor(
+    public cart: CartService,
+    private ventasService: VentasService,
+  ) {}
 
   seleccionarMetodo(metodo: 'efectivo' | 'tarjeta' | 'credito'): void {
     this.metodoPago = metodo;

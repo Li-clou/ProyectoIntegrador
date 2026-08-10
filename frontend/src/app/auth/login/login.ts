@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,10 +10,10 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './login.css',
 })
 export class Login {
-
   usuario = '';
   password = '';
   mostrarPassword = false;
@@ -22,8 +22,8 @@ export class Login {
 
   constructor(
     private router: Router,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+  ) {}
 
   onLogin() {
     this.errorMsg = '';
@@ -42,8 +42,8 @@ export class Login {
           timer: 1800,
           timerProgressBar: true,
           customClass: {
-            popup: 'rounded-3xl'
-          }
+            popup: 'rounded-3xl',
+          },
         }).then(() => {
           if (rolUsuario === 'admin') {
             this.router.navigate(['/home']);
@@ -55,7 +55,7 @@ export class Login {
       error: (err: any) => {
         this.cargando = false;
         this.errorMsg = err.error?.error || 'Usuario o contraseña incorrectos.';
-      }
+      },
     });
   }
 
@@ -79,7 +79,7 @@ export class Login {
           return 'Necesitas ingresar un correo electrónico';
         }
         return null;
-      }
+      },
     });
 
     if (email) {
@@ -87,7 +87,7 @@ export class Login {
         icon: 'success',
         title: '¡Correo enviado!',
         text: `Si el correo ${email} está registrado, recibirás un enlace de recuperación pronto.`,
-        confirmButtonColor: '#4A3B32'
+        confirmButtonColor: '#4A3B32',
       });
     }
   }

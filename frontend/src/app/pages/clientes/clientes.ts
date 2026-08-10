@@ -1,2 +1,72 @@
-import { Component,OnInit } from '@angular/core'; import { CommonModule } from '@angular/common'; import { FormsModule } from '@angular/forms'; import Swal from 'sweetalert2'; import { Cliente,ClientesService } from '../../services/clientes.service';
-@Component({selector:'app-clientes',standalone:true,imports:[CommonModule,FormsModule],templateUrl:'./clientes.html'}) export class ClientesComponent implements OnInit{clientes:Cliente[]=[];buscar='';cliente=this.vacio();editando=false;error='';constructor(private api:ClientesService){}ngOnInit(){this.cargar();}vacio():Cliente{return{nombre_cliente:'',rfc:'',domicilio:'',telefono:''};}cargar(){this.api.listar(this.buscar).subscribe({next:x=>this.clientes=x,error:e=>this.error=e.error?.error||'No se pudieron cargar clientes'});}editar(c:Cliente){this.cliente={...c};this.editando=true;}guardar(){if(!this.cliente.nombre_cliente){this.error='El nombre es obligatorio';return;}const q=this.editando&&this.cliente.id_cliente?this.api.actualizar(this.cliente.id_cliente,this.cliente):this.api.crear(this.cliente);q.subscribe({next:()=>{this.cliente=this.vacio();this.editando=false;this.error='';this.cargar();},error:e=>this.error=e.error?.error||'No se pudo guardar'});}eliminar(c:Cliente){Swal.fire({title:`¿Eliminar a ${c.nombre_cliente}?`,icon:'warning',showCancelButton:true}).then(r=>{if(r.isConfirmed&&c.id_cliente)this.api.eliminar(c.id_cliente).subscribe({next:()=>this.cargar(),error:e=>Swal.fire('Error',e.error?.error||'','error')});});}}
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
+import { Cliente, ClientesService } from '../../services/clientes.service';
+@Component({
+  selector: 'app-clientes',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './clientes.html',
+})
+export class ClientesComponent implements OnInit {
+  clientes: Cliente[] = [];
+  buscar = '';
+  cliente = this.vacio();
+  editando = false;
+  error = '';
+  constructor(private api: ClientesService) {}
+  ngOnInit() {
+    this.cargar();
+  }
+  vacio(): Cliente {
+    return { nombre_cliente: '', rfc: '', domicilio: '', telefono: '' };
+  }
+  cargar() {
+    this.api
+      .listar(this.buscar)
+      .subscribe({
+        next: (x) => (this.clientes = x),
+        error: (e) => (this.error = e.error?.error || 'No se pudieron cargar clientes'),
+      });
+  }
+  editar(c: Cliente) {
+    this.cliente = { ...c };
+    this.editando = true;
+  }
+  guardar() {
+    if (!this.cliente.nombre_cliente) {
+      this.error = 'El nombre es obligatorio';
+      return;
+    }
+    const q =
+      this.editando && this.cliente.id_cliente
+        ? this.api.actualizar(this.cliente.id_cliente, this.cliente)
+        : this.api.crear(this.cliente);
+    q.subscribe({
+      next: () => {
+        this.cliente = this.vacio();
+        this.editando = false;
+        this.error = '';
+        this.cargar();
+      },
+      error: (e) => (this.error = e.error?.error || 'No se pudo guardar'),
+    });
+  }
+  eliminar(c: Cliente) {
+    Swal.fire({
+      title: `¿Eliminar a ${c.nombre_cliente}?`,
+      icon: 'warning',
+      showCancelButton: true,
+    }).then((r) => {
+      if (r.isConfirmed && c.id_cliente)
+        this.api
+          .eliminar(c.id_cliente)
+          .subscribe({
+            next: () => this.cargar(),
+            error: (e) => Swal.fire('Error', e.error?.error || '', 'error'),
+          });
+    });
+  }
+}

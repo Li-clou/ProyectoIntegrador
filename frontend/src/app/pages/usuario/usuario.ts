@@ -1,4 +1,4 @@
-import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -9,10 +9,10 @@ import { Usuario, Rol } from '../../models/usuario.models';
   selector: 'app-usuarios',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './usuario.html',
 })
 export class UsuariosComponent implements OnInit {
-
   usuarios: Usuario[] = [];
   usuariosFiltrados: Usuario[] = [];
 
@@ -23,7 +23,12 @@ export class UsuariosComponent implements OnInit {
   filtroRol: 'Todos' | 'admin' | 'cajero' | 'pendiente' = 'Todos';
 
   // ===== NUEVA PROPIEDAD AGREGADA =====
-  filtros: ('Todos' | 'admin' | 'cajero' | 'pendiente')[] = ['Todos', 'admin', 'cajero', 'pendiente'];
+  filtros: ('Todos' | 'admin' | 'cajero' | 'pendiente')[] = [
+    'Todos',
+    'admin',
+    'cajero',
+    'pendiente',
+  ];
 
   mostrarModal = false;
   modoEdicion = false;
@@ -33,7 +38,10 @@ export class UsuariosComponent implements OnInit {
   private readonly REGEX_TELEFONO = /^[0-9]{10}$/;
   private readonly REGEX_USUARIO = /^[A-Za-z0-9_]+$/;
 
-  constructor(private usuariosService: UsuariosService, private cdr: ChangeDetectorRef) { }
+  constructor(
+    private usuariosService: UsuariosService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.cargarUsuarios();
@@ -50,13 +58,12 @@ export class UsuariosComponent implements OnInit {
         //console.log('3. FILTRADOS:', this.usuariosFiltrados);
         this.cargando = false;
         //console.log('4. CARGANDO:', this.cargando);
-        this.cdr.detectChanges();  // 👈 fuerza el repintado
-
+        this.cdr.detectChanges(); // 👈 fuerza el repintado
       },
       error: (err) => {
         this.errorMsg = err.error?.error || 'No se pudieron cargar los usuarios';
         this.cargando = false;
-      }
+      },
     });
   }
 
@@ -64,7 +71,7 @@ export class UsuariosComponent implements OnInit {
   aplicarFiltros(): void {
     const texto = this.busqueda.trim().toLowerCase();
 
-    this.usuariosFiltrados = this.usuarios.filter(u => {
+    this.usuariosFiltrados = this.usuarios.filter((u) => {
       const coincideTexto =
         !texto ||
         `${u.nombre_us} ${u.ap_us} ${u.am_us ?? ''}`.toLowerCase().includes(texto) ||
@@ -88,11 +95,11 @@ export class UsuariosComponent implements OnInit {
   }
 
   get totalConRol(): number {
-    return this.usuarios.filter(u => !!u.rol).length;
+    return this.usuarios.filter((u) => !!u.rol).length;
   }
 
   get totalPendientes(): number {
-    return this.usuarios.filter(u => !u.rol).length;
+    return this.usuarios.filter((u) => !u.rol).length;
   }
 
   etiquetaRol(rol: Rol): string {
@@ -107,7 +114,12 @@ export class UsuariosComponent implements OnInit {
   }
 
   colorAvatar(u: Usuario): string {
-    const colores = ['bg-emerald-100 text-emerald-700', 'bg-sky-100 text-sky-700', 'bg-amber-100 text-amber-700', 'bg-violet-100 text-violet-700'];
+    const colores = [
+      'bg-emerald-100 text-emerald-700',
+      'bg-sky-100 text-sky-700',
+      'bg-amber-100 text-amber-700',
+      'bg-violet-100 text-violet-700',
+    ];
     const index = (u.id_usuario ?? 0) % colores.length;
     return colores[index];
   }
@@ -149,12 +161,17 @@ export class UsuariosComponent implements OnInit {
   private validarUsuario(): string | null {
     const u = this.usuarioSeleccionado;
     if (!this.REGEX_SOLO_LETRAS.test(u.nombre_us)) return 'El nombre solo puede contener letras';
-    if (!this.REGEX_SOLO_LETRAS.test(u.ap_us)) return 'El apellido paterno solo puede contener letras';
-    if (!this.REGEX_SOLO_LETRAS.test(u.am_us)) return 'El apellido materno solo puede contener letras';
-    if (u.telefono && !this.REGEX_TELEFONO.test(u.telefono)) return 'El teléfono debe tener 10 dígitos numéricos';
-    if (!this.REGEX_USUARIO.test(u.usuario) || u.usuario.length < 4) return 'El usuario debe tener al menos 4 caracteres (letras, números, guion bajo)';
+    if (!this.REGEX_SOLO_LETRAS.test(u.ap_us))
+      return 'El apellido paterno solo puede contener letras';
+    if (!this.REGEX_SOLO_LETRAS.test(u.am_us))
+      return 'El apellido materno solo puede contener letras';
+    if (u.telefono && !this.REGEX_TELEFONO.test(u.telefono))
+      return 'El teléfono debe tener 10 dígitos numéricos';
+    if (!this.REGEX_USUARIO.test(u.usuario) || u.usuario.length < 4)
+      return 'El usuario debe tener al menos 4 caracteres (letras, números, guion bajo)';
     if (!u.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u.email)) return 'Captura un correo válido';
-    if (!this.modoEdicion && (!u.password || u.password.length < 8)) return 'La contraseña debe tener al menos 8 caracteres';
+    if (!this.modoEdicion && (!u.password || u.password.length < 8))
+      return 'La contraseña debe tener al menos 8 caracteres';
     return null;
   }
 
@@ -170,18 +187,24 @@ export class UsuariosComponent implements OnInit {
 
     if (this.modoEdicion && this.usuarioSeleccionado.id_usuario) {
       const { password, usuario, ...camposEditables } = this.usuarioSeleccionado;
-      this.usuariosService.actualizar(this.usuarioSeleccionado.id_usuario, camposEditables).subscribe({
-        next: () => {
-          this.cargando = false;
-          this.cerrarModal();
-          Swal.fire({ icon: 'success', title: 'Usuario actualizado', confirmButtonColor: '#4A3B32' });
-          this.cargarUsuarios();
-        },
-        error: (err) => {
-          this.cargando = false;
-          this.errorMsg = err.error?.error || 'Error al actualizar el usuario';
-        }
-      });
+      this.usuariosService
+        .actualizar(this.usuarioSeleccionado.id_usuario, camposEditables)
+        .subscribe({
+          next: () => {
+            this.cargando = false;
+            this.cerrarModal();
+            Swal.fire({
+              icon: 'success',
+              title: 'Usuario actualizado',
+              confirmButtonColor: '#4A3B32',
+            });
+            this.cargarUsuarios();
+          },
+          error: (err) => {
+            this.cargando = false;
+            this.errorMsg = err.error?.error || 'Error al actualizar el usuario';
+          },
+        });
     } else {
       this.usuariosService.crear(this.usuarioSeleccionado).subscribe({
         next: () => {
@@ -193,7 +216,7 @@ export class UsuariosComponent implements OnInit {
         error: (err) => {
           this.cargando = false;
           this.errorMsg = err.error?.error || 'Error al crear el usuario';
-        }
+        },
       });
     }
   }
@@ -208,17 +231,26 @@ export class UsuariosComponent implements OnInit {
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#4A3B32'
-    }).then(result => {
+      cancelButtonColor: '#4A3B32',
+    }).then((result) => {
       if (result.isConfirmed && usuario.id_usuario) {
         this.usuariosService.eliminar(usuario.id_usuario).subscribe({
           next: () => {
-            Swal.fire({ icon: 'success', title: 'Usuario eliminado', confirmButtonColor: '#4A3B32' });
+            Swal.fire({
+              icon: 'success',
+              title: 'Usuario eliminado',
+              confirmButtonColor: '#4A3B32',
+            });
             this.cargarUsuarios();
           },
           error: (err) => {
-            Swal.fire({ icon: 'error', title: 'No se pudo eliminar', text: err.error?.error || '', confirmButtonColor: '#4A3B32' });
-          }
+            Swal.fire({
+              icon: 'error',
+              title: 'No se pudo eliminar',
+              text: err.error?.error || '',
+              confirmButtonColor: '#4A3B32',
+            });
+          },
         });
       }
     });
