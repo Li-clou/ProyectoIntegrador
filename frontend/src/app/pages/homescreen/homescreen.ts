@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth.services';
 import { CajerosModal } from '../../components/cajeros-modal/cajeros-modal';
 import { environment } from '../../../environments/enviroments';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-homescreen',
@@ -20,6 +21,7 @@ export class Homescreen implements OnInit {
   mostrarCajeros = signal(false);
   usuarioActual: string = 'Cargando...';
   fechaActual: Date = new Date();
+  cargando = true; // 👈 nueva bandera
 
   stats: any = {
     ventasDia: 0,
@@ -42,7 +44,7 @@ export class Homescreen implements OnInit {
     private authService: AuthService,
     private router: Router,
     private http: HttpClient,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.authService.me().subscribe({
