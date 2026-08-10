@@ -1,7 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
 @keyframes slideIn {
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }
+}
+
+/* Shimmer para skeleton loaders */
+@keyframes shimmer {
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0ede8 25%, #e8e2d8 37%, #f0ede8 63%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s linear infinite;
 }
