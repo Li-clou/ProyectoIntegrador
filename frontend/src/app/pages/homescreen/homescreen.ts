@@ -10,6 +10,8 @@ import { CajerosModal } from '../../components/cajeros-modal/cajeros-modal';
 import { SkeletonComponent } from '../../components/skeleton/skeleton';
 import { environment } from '../../../environments/enviroments';
 
+
+
 @Component({
   selector: 'app-homescreen',
   standalone: true,
