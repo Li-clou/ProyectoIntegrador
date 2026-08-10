@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/enviroments';
 
 export interface RegistroPayload {
@@ -19,33 +19,67 @@ export interface LoginPayload {
   password: string;
 }
 
+const TOKEN_KEY = 'kunibo_token';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Se usa environment.authApi o por defecto '/api' para que el proxy de Angular maneje las peticiones y las cookies correctamente
   private readonly baseUrl = environment.authApi || '/api';
+
+  // Signal con el token actual, para que cualquier parte de la app
+  // (guards, interceptor) pueda leerlo de forma reactiva si hace falta.
+  token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
 
   constructor(private http: HttpClient) {}
 
   registrarCliente(datos: RegistroPayload): Observable<any> {
-    return this.http.post(`${this.baseUrl}/registro`, datos, { withCredentials: true });
+    return this.http.post(`${this.baseUrl}/registro`, datos);
   }
 
   login(datos: LoginPayload): Observable<any> {
-    return this.http.post(`${this.baseUrl}/login`, datos, { withCredentials: true });
+    return this.http.post(`${this.baseUrl}/login`, datos).pipe(
+      tap((resp: any) => {
+        if (resp?.token) {
+          this.guardarToken(resp.token);
+        }
+      })
+    );
   }
 
   logout(): Observable<any> {
-    return this.http.post(`${this.baseUrl}/logout`, {}, { withCredentials: true });
+    return this.http.post(`${this.baseUrl}/logout`, {}).pipe(
+      tap(() => this.limpiarToken())
+    );
   }
 
-  // El AuthGuard usa esto para saber si hay sesión activa.
-  // Como la cookie es httpOnly, Angular no puede leerla directo;
-  // preguntamos al backend y él confirma según el JWT de la cookie.
   me(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/me`, { withCredentials: true });
+    return this.http.get(`${this.baseUrl}/me`);
   }
 
   loginConGoogle(credential: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/google`, { credential }, { withCredentials: true });
+    return this.http.post(`${this.baseUrl}/auth/google`, { credential }).pipe(
+      tap((resp: any) => {
+        if (resp?.token) {
+          this.guardarToken(resp.token);
+        }
+      })
+    );
+  }
+
+  guardarToken(token: string): void {
+    localStorage.setItem(TOKEN_KEY, token);
+    this.token.set(token);
+  }
+
+  limpiarToken(): void {
+    localStorage.removeItem(TOKEN_KEY);
+    this.token.set(null);
+  }
+
+  getToken(): string | null {
+    return this.token();
+  }
+
+  estaAutenticado(): boolean {
+    return !!this.token();
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { AuthService } from '../../services/auth.services';
@@ -10,6 +10,7 @@ type Rol = 'admin' | 'cajero' | 'pendiente';
   standalone: true,
   imports: [RouterOutlet, Sidebar],
   templateUrl: './main-layout.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './main-layout.css',
 })
 export class MainLayout implements OnInit {
@@ -22,7 +23,7 @@ export class MainLayout implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -36,7 +37,7 @@ export class MainLayout implements OnInit {
       error: () => {
         this.nombreUsuario.set('Usuario');
         this.rolUsuario.set('cajero');
-      }
+      },
     });
   }
 
