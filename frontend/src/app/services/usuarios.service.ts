@@ -2,28 +2,27 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Usuario } from '../models/usuario.models';
+import { environment } from '../../environments/enviroments';
 
 @Injectable({ providedIn: 'root' })
 export class UsuariosService {
-  // Ruta relativa, igual que AuthService: el proxy de Angular la
-  // reenvía a http://localhost:3003/api/usuarios
-  private readonly baseUrl = '/api/usuarios';
+  private readonly baseUrl = environment.usuariosApi + '/usuarios';
 
   constructor(private http: HttpClient) {}
 
   listar(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(this.baseUrl, { withCredentials: true });
+    return this.http.get<Usuario[]>(this.baseUrl);
   }
 
   crear(usuario: Usuario): Observable<Usuario> {
-    return this.http.post<Usuario>(this.baseUrl, usuario, { withCredentials: true });
+    return this.http.post<Usuario>(this.baseUrl, usuario);
   }
 
   actualizar(id: number, usuario: Partial<Usuario>): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.baseUrl}/${id}`, usuario, { withCredentials: true });
+    return this.http.put<Usuario>(`${this.baseUrl}/${id}`, usuario);
   }
 
   eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }
