@@ -2,7 +2,7 @@ import { Component, signal, OnInit, ChangeDetectionStrategy } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth.services';
 import { CajerosModal } from '../../components/cajeros-modal/cajeros-modal';
@@ -11,7 +11,7 @@ import { environment } from '../../../environments/enviroments';
 @Component({
   selector: 'app-homescreen',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HttpClientModule, CajerosModal],
+  imports: [CommonModule, FormsModule, RouterModule, CajerosModal],
   templateUrl: './homescreen.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './homescreen.css',
