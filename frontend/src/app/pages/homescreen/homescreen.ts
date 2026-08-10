@@ -3,16 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth.services';
 import { CajerosModal } from '../../components/cajeros-modal/cajeros-modal';
+import { SkeletonComponent } from '../../components/skeleton/skeleton';
 import { environment } from '../../../environments/enviroments';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-homescreen',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, CajerosModal],
+  imports: [CommonModule, FormsModule, RouterModule, CajerosModal, SkeletonComponent],
   templateUrl: './homescreen.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './homescreen.css',
@@ -21,7 +22,7 @@ export class Homescreen implements OnInit {
   mostrarCajeros = signal(false);
   usuarioActual: string = 'Cargando...';
   fechaActual: Date = new Date();
-  cargando = true; // 👈 nueva bandera
+  cargando = true;
 
   stats: any = {
     ventasDia: 0,
@@ -44,7 +45,7 @@ export class Homescreen implements OnInit {
     private authService: AuthService,
     private router: Router,
     private http: HttpClient,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.authService.me().subscribe({
@@ -55,29 +56,29 @@ export class Homescreen implements OnInit {
   }
 
   cargarDashboardCompleto(): void {
-    this.http.get<any>(`${this.dashboardUrl}/stats`).subscribe({
-      next: (res) => (this.stats = res),
-      error: (err) => console.error('Error stats:', err),
-    });
+    this.cargando = true;
 
-    this.http.get<any[]>(`${this.dashboardUrl}/cajeros-activos`).subscribe({
-      next: (res) => (this.cajerosActivos = res),
-    });
-
-    this.http.get<any[]>(`${this.dashboardUrl}/inventario-bajo`).subscribe({
-      next: (res) => (this.inventarioBajoLista = res),
-    });
-
-    this.http.get<any[]>(`${this.dashboardUrl}/turnos-recientes`).subscribe({
-      next: (res) => (this.turnosRecientes = res),
-    });
-
-    this.http.get<any[]>(`${this.dashboardUrl}/ventas-recientes`).subscribe({
-      next: (res) => (this.ventasRecientes = res),
-    });
-
-    this.http.get<any[]>(`${this.dashboardUrl}/grafica`).subscribe({
-      next: (res) => this.procesarGrafica(res),
+    forkJoin({
+      stats: this.http.get<any>(`${this.dashboardUrl}/stats`),
+      cajeros: this.http.get<any[]>(`${this.dashboardUrl}/cajeros-activos`),
+      inventario: this.http.get<any[]>(`${this.dashboardUrl}/inventario-bajo`),
+      turnos: this.http.get<any[]>(`${this.dashboardUrl}/turnos-recientes`),
+      ventas: this.http.get<any[]>(`${this.dashboardUrl}/ventas-recientes`),
+      grafica: this.http.get<any[]>(`${this.dashboardUrl}/grafica`),
+    }).subscribe({
+      next: (res) => {
+        this.stats = res.stats;
+        this.cajerosActivos = res.cajeros;
+        this.inventarioBajoLista = res.inventario;
+        this.turnosRecientes = res.turnos;
+        this.ventasRecientes = res.ventas;
+        this.procesarGrafica(res.grafica);
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error dashboard:', err);
+        this.cargando = false;
+      },
     });
   }
 
