@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /$
+Allow: /inicio-sesion
+Allow: /registro
+Disallow: /home
+Disallow: /cajero-homescreen
+Disallow: /inventario
+Disallow: /ventas
+Disallow: /usuarios
+
+Sitemap: https://kunibo.up.railway.app/sitemap.xml
