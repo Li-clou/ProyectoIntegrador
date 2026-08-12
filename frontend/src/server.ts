@@ -10,7 +10,16 @@ import { join } from 'node:path';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+
+// Railway (como la mayoría de hostings) pone tu app detrás de un proxy inverso,
+// que agrega cabeceras X-Forwarded-Host y X-Forwarded-Proto para indicar el
+// dominio y protocolo REALES por los que entró la petición. Angular v22 ignora
+// esas cabeceras por defecto (medida de seguridad contra ataques de proxy
+// falsificado). Como confiamos en el proxy de Railway, se las habilitamos aquí.
+// Más info: https://angular.dev/best-practices/security#configuring-trusted-proxy-headers
+const angularApp = new AngularNodeAppEngine({
+  trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],
+});
 
 /**
  * Example Express Rest API endpoints can be defined here.
