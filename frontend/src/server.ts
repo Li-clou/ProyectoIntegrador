@@ -11,14 +11,18 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 
-// Railway (como la mayoría de hostings) pone tu app detrás de un proxy inverso,
-// que agrega cabeceras X-Forwarded-Host y X-Forwarded-Proto para indicar el
-// dominio y protocolo REALES por los que entró la petición. Angular v22 ignora
-// esas cabeceras por defecto (medida de seguridad contra ataques de proxy
-// falsificado). Como confiamos en el proxy de Railway, se las habilitamos aquí.
-// Más info: https://angular.dev/best-practices/security#configuring-trusted-proxy-headers
+// Railway pone tu app detrás de un proxy inverso que agrega cabeceras
+// X-Forwarded-* con el dominio/protocolo real de la petición. Angular v22
+// necesita DOS cosas para aceptar esto:
+//   1. trustProxyHeaders -> confiar en esas cabeceras del proxy.
+//   2. allowedHosts -> lista explícita de los hostnames válidos de tu app.
+// Sin el 2, Angular rechaza la petición con 400 Bad Request aunque el
+// header sea confiable. Más info:
+// https://angular.dev/best-practices/security#configuring-trusted-proxy-headers
+// https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf
 const angularApp = new AngularNodeAppEngine({
-  trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],
+  trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-for'],
+  allowedHosts: ['kunibo.up.railway.app'],
 });
 
 /**
