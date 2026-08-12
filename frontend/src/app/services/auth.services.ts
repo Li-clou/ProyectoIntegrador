@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/enviroments';
@@ -25,9 +26,13 @@ const TOKEN_KEY = 'kunibo_token';
 export class AuthService {
   private readonly baseUrl = environment.authApi || '/api';
 
-  // Signal con el token actual, para que cualquier parte de la app
-  // (guards, interceptor) pueda leerlo de forma reactiva si hace falta.
-  token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
+  // Detecta si estamos en el navegador (true) o en el servidor durante SSR/prerender (false).
+  // Sin esto, cualquier acceso a localStorage revienta en el servidor.
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
+
+  // Signal con el token actual. En el servidor arranca en null (no hay sesión que leer ahí).
+  token = signal<string | null>(this.isBrowser ? localStorage.getItem(TOKEN_KEY) : null);
 
   constructor(private http: HttpClient) {}
 
@@ -66,12 +71,16 @@ export class AuthService {
   }
 
   guardarToken(token: string): void {
-    localStorage.setItem(TOKEN_KEY, token);
+    if (this.isBrowser) {
+      localStorage.setItem(TOKEN_KEY, token);
+    }
     this.token.set(token);
   }
 
   limpiarToken(): void {
-    localStorage.removeItem(TOKEN_KEY);
+    if (this.isBrowser) {
+      localStorage.removeItem(TOKEN_KEY);
+    }
     this.token.set(null);
   }
 
